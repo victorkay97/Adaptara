@@ -1,7 +1,7 @@
 # Delivery Phases
 
-1. **Phase 1 — Foundation (current)**
-2. Phase 2 — Contract Vault
+1. **Phase 1 — Foundation (complete)**
+2. **Phase 2 — Contract Vault (current)**
 3. Phase 3 — Portfolio & RWA Intelligence
 4. Phase 4 — Deterministic Risk Engine
 5. Phase 5 — AI Agent
@@ -14,4 +14,4 @@
 12. Phase 12 — X Layer Deployment & Submission
 13. Phase 13 — Demo Rehearsal
 
-Only Phase 1 is in scope; later labels describe intent, not implemented capability.
+Only Phase 2 is currently in scope; later labels describe intent, not implemented capability.

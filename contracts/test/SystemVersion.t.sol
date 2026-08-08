@@ -5,8 +5,8 @@ import {Test} from "forge-std/Test.sol";
 import {SystemVersion} from "../src/SystemVersion.sol";
 
 contract SystemVersionTest is Test {
-    function testVersionIsPhaseOne() public {
+    function testVersionIsPhaseTwo() public {
         SystemVersion systemVersion = new SystemVersion();
-        assertEq(systemVersion.version(), "phase-1");
+        assertEq(systemVersion.version(), "phase-2");
     }
 }
