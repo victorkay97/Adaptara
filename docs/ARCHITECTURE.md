@@ -38,6 +38,22 @@ Phase 3 queries only the configured Adaptara-supported asset set; it is not a co
 
 The product catalog uses stable IDs rather than addresses as business identifiers. Addresses are environment-specific and optional. Static `baselineRiskTier` metadata remains distinct from the future dynamic risk engine. Reference pricing is behind an interface; the Phase 3 provider is explicitly demo-only and does not make oracle or peg claims.
 
+## Phase 4 deterministic risk layer
+
+```text
+PortfolioSnapshot
+       ↓
+Risk Signal Provider
+       ↓
+Risk Engine
+       ↓
+AssetRiskAssessment
+       ↓
+PortfolioRiskAssessment
+```
+
+Risk imports immutable Phase 3 portfolio types; portfolio does not import risk. Five normalized factors come from an explicitly demo-only provider and concentration comes from Phase 3 allocation. Provider loading is separated from pure integer scoring. Incomplete valuation or signal coverage cannot produce a complete score.
+
 ## Intended later architecture
 
 ```text

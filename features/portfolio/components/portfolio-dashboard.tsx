@@ -10,6 +10,9 @@ import { formatUnitsExact } from "../money";
 import { DemoReferencePriceProvider } from "../prices";
 import { discoverVault, readVaultPortfolio, readWalletPortfolio } from "../readers";
 import type { AssetPosition, PortfolioSnapshot } from "../types";
+import { RiskIntelligence } from "@/features/risk/components/risk-intelligence";
+import { calculatePortfolioRisk } from "@/features/risk/portfolio-risk";
+import { getDemoRiskSignals } from "@/features/risk/signals";
 
 const demoPrices = new DemoReferencePriceProvider();
 const displayNumber = (value: string) => { const [whole, fraction] = value.split("."); return `${BigInt(whole).toLocaleString()}${fraction ? `.${fraction.slice(0, 4)}` : ""}`; };
@@ -35,6 +38,7 @@ function PositionCard({ position }: { position: AssetPosition }) {
 }
 
 function SnapshotPanel({ title, snapshot }: { title: string; snapshot: PortfolioSnapshot }) {
+  const riskSignals = new Map(snapshot.positions.map((position) => [position.asset.id, getDemoRiskSignals(position.asset.id)]));
   const largest = snapshot.valuationStatus === "valued"
     ? snapshot.positions.reduce<AssetPosition | undefined>((current, position) => {
         if (position.usdValue === null) return current;
@@ -56,6 +60,7 @@ function SnapshotPanel({ title, snapshot }: { title: string; snapshot: Portfolio
     {snapshot.valuationStatus === "unavailable" && snapshot.totals.unknownBalanceAssetCount > 0 ? <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-800">Portfolio value is unavailable because one or more configured balances could not be read or verified.</p> : null}
     {snapshot.totals.nonzeroAssetCount === 0 && snapshot.totals.unknownBalanceAssetCount === 0 ? <p className="mt-4 text-sm text-[var(--muted)]">No supported token balances were found for this source.</p> : null}
     <div className="mt-5 grid gap-3">{snapshot.positions.map((position) => <PositionCard key={position.asset.id} position={position} />)}</div>
+    <RiskIntelligence assessment={calculatePortfolioRisk(snapshot, riskSignals, snapshot.capturedAt)} />
   </section>;
 }
 

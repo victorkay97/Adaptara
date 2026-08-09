@@ -47,3 +47,9 @@ A configured asset with a failed read or configuration error has an unknown bala
 Portfolio discovery covers only the configured Adaptara-supported catalog. Unsolicited tokens can exist in wallets and vaults but are not enumerated or silently treated as supported exposure. Wallet and vault sources are displayed separately, and onchain balances remain authoritative.
 
 `baselineRiskTier` is static product/registry metadata. A future adaptive current tier belongs to the Phase 4 Risk Engine and is not calculated here. Demo reference prices are deterministic development inputs, not live market truth, peg verification, performance data, or investment advice.
+
+## Phase 4 risk-engine security
+
+Risk output is deterministic, read-only advisory data with no transaction, signature, contract-write, or vault authority. Incomplete valuation, invalid allocation, malformed normalized inputs, or missing signal coverage cannot produce a complete portfolio score. Demo risk inputs are visibly labeled and are not live market truth, predictions, legal/creditworthiness determinations, or oracle data.
+
+Weights and tier thresholds are fixed in typed engine configuration and tested; MARA cannot define or change them. Assessments preserve their mathematical factor inputs and provenance. Any future execution remains independently subject to policy, contract, and oracle validation.

@@ -2,8 +2,8 @@
 
 1. **Phase 1 — Foundation (complete)**
 2. **Phase 2 — Contract Vault (complete)**
-3. **Phase 3 — Portfolio & RWA Intelligence (current)**
-4. Phase 4 — Deterministic Risk Engine
+3. **Phase 3 — Portfolio & RWA Intelligence (complete)**
+4. **Phase 4 — Deterministic Risk Engine (current)**
 5. Phase 5 — AI Agent
 6. Phase 6 — Financial Constitution
 7. Phase 7 — Adaptation Engine
@@ -14,4 +14,4 @@
 12. Phase 12 — X Layer Deployment & Submission
 13. Phase 13 — Demo Rehearsal
 
-Only Phase 3 is currently in scope; later labels describe intent, not implemented capability.
+Only Phase 4 is currently in scope; later labels describe intent, not implemented capability.
