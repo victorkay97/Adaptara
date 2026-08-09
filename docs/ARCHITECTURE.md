@@ -64,3 +64,14 @@ User -> Wallet -> Portfolio Engine -> Market/Oracle Data
 ```
 
 The deterministic risk engine operates independently of the LLM. AI recommendations must become structured proposals and pass onchain policy validation before execution. Blockchain state is authoritative for ownership, balances, financial policy, and executed transactions; backend records and AI output cannot override it. The vault is multi-asset, does not use ERC-4626, and issues no shares.
+# Phase 5 MARA flow
+
+```text
+X Layer -> Portfolio Readers -> PortfolioSnapshot
+        -> Deterministic Risk Engine -> PortfolioRiskAssessment
+        -> MARA Context Builder -> OpenAI Responses API
+        -> Strict Structured Output -> Application Post-Validation
+        -> Advisory MARA UI
+```
+
+Dependencies remain `portfolio -> risk -> mara`; Portfolio and Risk do not import MARA. LLM interpretation is non-deterministic and advisory, while upstream facts remain authoritative.

@@ -17,20 +17,22 @@ export async function readPortfolio(params: { client: PublicClient; accountAddre
   if (chainId !== XLAYER_TESTNET_CHAIN_ID) throw new Error(`Unsupported chain ${chainId}; expected ${XLAYER_TESTNET_CHAIN_ID}`);
   const blockNumber = await client.getBlockNumber();
   const configured = assets.filter((asset) => asset.address);
-  const contracts = configured.flatMap((asset) => [
-    { address: asset.address!, abi: erc20ReadAbi, functionName: "balanceOf" as const, args: [accountAddress] as const },
-    { address: asset.address!, abi: erc20ReadAbi, functionName: "decimals" as const },
-  ]);
-  const results = contracts.length ? await client.multicall({ contracts, allowFailure: true, blockNumber }) : [];
-  let resultIndex = 0;
+  const readResults = await Promise.all(configured.map(async (asset) => {
+    const [balance, decimals] = await Promise.all([
+      client.readContract({ address: asset.address!, abi: erc20ReadAbi, functionName: "balanceOf", args: [accountAddress], blockNumber }).then((result) => ({ ok: true as const, result: result as bigint })).catch((error: unknown) => ({ ok: false as const, error })),
+      client.readContract({ address: asset.address!, abi: erc20ReadAbi, functionName: "decimals", blockNumber }).then((result) => ({ ok: true as const, result: Number(result) })).catch((error: unknown) => ({ ok: false as const, error })),
+    ]);
+    return [asset.id, { balance, decimals }] as const;
+  }));
+  const results = new Map(readResults);
   const positions: AssetPosition[] = assets.map((asset) => {
     if (!asset.address) return failedPosition(asset, "not-configured");
-    const balanceResult = results[resultIndex++];
-    const decimalsResult = results[resultIndex++];
-    if (!balanceResult || balanceResult.status === "failure") return failedPosition(asset, "read-error", balanceResult?.error.message ?? "Balance read failed");
-    if (!decimalsResult || decimalsResult.status === "failure") return failedPosition(asset, "read-error", decimalsResult?.error.message ?? "Decimals read failed");
-    const rawBalance = balanceResult.result as bigint;
-    const decimals = Number(decimalsResult.result);
+    const result = results.get(asset.id);
+    if (!result) return failedPosition(asset, "read-error", "Balance read failed");
+    if (!result.balance.ok) return failedPosition(asset, "read-error", errorMessage(result.balance.error, "Balance read failed"));
+    if (!result.decimals.ok) return failedPosition(asset, "read-error", errorMessage(result.decimals.error, "Decimals read failed"));
+    const rawBalance = result.balance.result;
+    const decimals = result.decimals.result;
     if (decimals !== asset.expectedDecimals) return failedPosition(asset, "configuration-error", `Decimals mismatch: expected ${asset.expectedDecimals}, received ${decimals}`);
     return { asset, availability: "available", rawBalance, balanceDecimals: decimals, displayBalance: formatUnitsExact(rawBalance, decimals), referencePrice: null, usdValue: null, usdValueDecimals: PRICE_DECIMALS, allocationBps: null };
   });
@@ -39,6 +41,8 @@ export async function readPortfolio(params: { client: PublicClient; accountAddre
   const valuation = valuePositions(positions, prices);
   return { source, accountAddress, chainId, blockNumber, blockConsistency: "single-block", capturedAt: new Date().toISOString(), ...valuation, priceSources: [...new Set([...prices.values()].map((price) => price.source))] };
 }
+
+const errorMessage = (error: unknown, fallback: string): string => error instanceof Error ? error.message : fallback;
 
 export const readWalletPortfolio = (params: Omit<Parameters<typeof readPortfolio>[0], "source">) => readPortfolio({ ...params, source: "wallet" });
 export const readVaultPortfolio = (params: Omit<Parameters<typeof readPortfolio>[0], "source">) => readPortfolio({ ...params, source: "vault" });

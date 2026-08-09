@@ -15,3 +15,10 @@
 13. Phase 13 — Demo Rehearsal
 
 Only Phase 4 is currently in scope; later labels describe intent, not implemented capability.
+# Current phase status
+
+- Phase 1 — Complete
+- Phase 2 — Complete
+- Phase 3 — Complete
+- Phase 4 — Complete
+- Phase 5 — Current

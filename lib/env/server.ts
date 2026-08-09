@@ -11,6 +11,7 @@ const schema = z.object({
   CHAINLINK_VERIFIER_PROXY: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
   AGENT_EXECUTOR_PRIVATE_KEY: z.string().regex(/^0x[a-fA-F0-9]{64}$/).optional(),
   OPENAI_API_KEY: z.string().min(1).optional(),
+  OPENAI_MODEL: z.string().trim().min(1).default("gpt-5.6"),
   DATABASE_URL: z.url().optional(),
 });
 

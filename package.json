@@ -15,6 +15,7 @@
   "dependencies": {
     "@tanstack/react-query": "^5.87.1",
     "next": "16.3.0",
+    "openai": "^7.4.0",
     "react": "19.2.8",
     "react-dom": "19.2.8",
     "viem": "^2.37.5",
@@ -31,5 +32,13 @@
     "tailwindcss": "^4",
     "typescript": "^5",
     "vitest": "^3.2.4"
+  },
+  "overrides": {
+  "@coinbase/cdp-sdk@1.55.0": {
+    "axios": "1.18.0"
+  },
+  "viem@2.23.2": {
+    "ws": "8.21.0"
   }
+}
 }

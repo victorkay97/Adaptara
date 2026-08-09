@@ -53,3 +53,6 @@ Portfolio discovery covers only the configured Adaptara-supported catalog. Unsol
 Risk output is deterministic, read-only advisory data with no transaction, signature, contract-write, or vault authority. Incomplete valuation, invalid allocation, malformed normalized inputs, or missing signal coverage cannot produce a complete portfolio score. Demo risk inputs are visibly labeled and are not live market truth, predictions, legal/creditworthiness determinations, or oracle data.
 
 Weights and tier thresholds are fixed in typed engine configuration and tested; MARA cannot define or change them. Assessments preserve their mathematical factor inputs and provenance. Any future execution remains independently subject to policy, contract, and oracle validation.
+# Phase 5 MARA boundary
+
+MARA and OpenAI have zero wallet and transaction authority. MARA receives privacy-minimized context, has no tools, and its output is untrusted until strict post-validation. User questions are untrusted input and cannot alter the server-owned policy, model, schema, or capabilities. Incomplete deterministic state cannot produce complete advice. Future execution must independently validate current chain state and policy.

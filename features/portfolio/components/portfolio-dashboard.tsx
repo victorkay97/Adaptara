@@ -13,6 +13,7 @@ import type { AssetPosition, PortfolioSnapshot } from "../types";
 import { RiskIntelligence } from "@/features/risk/components/risk-intelligence";
 import { calculatePortfolioRisk } from "@/features/risk/portfolio-risk";
 import { getDemoRiskSignals } from "@/features/risk/signals";
+import { MaraPanel } from "@/features/mara/components/mara-panel";
 
 const demoPrices = new DemoReferencePriceProvider();
 const displayNumber = (value: string) => { const [whole, fraction] = value.split("."); return `${BigInt(whole).toLocaleString()}${fraction ? `.${fraction.slice(0, 4)}` : ""}`; };
@@ -39,6 +40,7 @@ function PositionCard({ position }: { position: AssetPosition }) {
 
 function SnapshotPanel({ title, snapshot }: { title: string; snapshot: PortfolioSnapshot }) {
   const riskSignals = new Map(snapshot.positions.map((position) => [position.asset.id, getDemoRiskSignals(position.asset.id)]));
+  const riskAssessment = calculatePortfolioRisk(snapshot, riskSignals, snapshot.capturedAt);
   const largest = snapshot.valuationStatus === "valued"
     ? snapshot.positions.reduce<AssetPosition | undefined>((current, position) => {
         if (position.usdValue === null) return current;
@@ -60,7 +62,8 @@ function SnapshotPanel({ title, snapshot }: { title: string; snapshot: Portfolio
     {snapshot.valuationStatus === "unavailable" && snapshot.totals.unknownBalanceAssetCount > 0 ? <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-800">Portfolio value is unavailable because one or more configured balances could not be read or verified.</p> : null}
     {snapshot.totals.nonzeroAssetCount === 0 && snapshot.totals.unknownBalanceAssetCount === 0 ? <p className="mt-4 text-sm text-[var(--muted)]">No supported token balances were found for this source.</p> : null}
     <div className="mt-5 grid gap-3">{snapshot.positions.map((position) => <PositionCard key={position.asset.id} position={position} />)}</div>
-    <RiskIntelligence assessment={calculatePortfolioRisk(snapshot, riskSignals, snapshot.capturedAt)} />
+    <RiskIntelligence assessment={riskAssessment} />
+    <MaraPanel snapshot={snapshot} assessment={riskAssessment} />
   </section>;
 }
 
@@ -82,6 +85,5 @@ export function PortfolioDashboard() {
   return <div className="grid gap-6">
     {wallet.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Reading wallet balances…</p> : wallet.isError ? <p className="rounded-3xl bg-red-50 p-8 text-red-800" role="alert">Wallet portfolio unavailable: {wallet.error.message}</p> : wallet.data ? <SnapshotPanel title="Your Wallet" snapshot={wallet.data} /> : null}
     <section>{vault.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Discovering Adaptara Vault…</p> : vault.data?.status === "not-configured" ? <div className="rounded-3xl border border-[var(--line)] bg-white/70 p-8"><h2 className="text-2xl font-semibold">Adaptara Vault</h2><p className="mt-3 text-[var(--muted)]">Vault integration not deployed yet.</p></div> : vault.data?.status === "not-created" ? <div className="rounded-3xl border border-[var(--line)] bg-white/70 p-8"><h2 className="text-2xl font-semibold">Adaptara Vault</h2><p className="mt-3 text-[var(--muted)]">No Adaptara Vault found.</p></div> : vault.data?.status === "read-error" ? <p className="rounded-3xl bg-red-50 p-8 text-red-800" role="alert">Vault discovery unavailable: {vault.data.error}</p> : vaultPortfolio.isPending ? <p className="rounded-3xl bg-white/70 p-8">Reading vault balances…</p> : vaultPortfolio.data ? <SnapshotPanel title="Adaptara Vault" snapshot={vaultPortfolio.data} /> : null}</section>
-    <section className="rounded-3xl border border-[var(--line)] bg-white/60 p-6"><p className="text-xs font-bold uppercase tracking-[0.16em] text-[var(--muted)]">MARA</p><p className="mt-2">Intelligence engine coming online in a later phase.</p></section>
   </div>;
 }
