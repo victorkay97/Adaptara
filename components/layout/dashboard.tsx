@@ -3,6 +3,7 @@
 import { useAccount } from "wagmi";
 import { xLayerTestnet } from "@/lib/chain/xlayer";
 import { WalletControl } from "@/components/wallet/wallet-control";
+import { PortfolioDashboard } from "@/features/portfolio/components/portfolio-dashboard";
 
 function StatusCard({ eyebrow, title, detail, tone = "green" }: { eyebrow: string; title: string; detail: string; tone?: "green" | "amber" | "slate" }) {
   const dot = tone === "green" ? "bg-emerald-500" : tone === "amber" ? "bg-amber-500" : "bg-slate-400";
@@ -35,8 +36,9 @@ export function Dashboard() {
       <section aria-label="Foundation status" className="grid gap-4 pb-12 md:grid-cols-3">
         <StatusCard eyebrow="Wallet" title={isConnected ? "Connected" : "Disconnected"} detail={isConnected ? "Your wallet is available for network validation." : "Connect an existing wallet to begin network validation."} tone={isConnected ? "green" : "slate"} />
         <StatusCard eyebrow="X Layer" title={onXLayer ? "Connected to X Layer Testnet" : isConnected ? "Wrong Network" : "Awaiting Wallet"} detail={onXLayer ? "Chain ID 1952 · test OKB gas." : "Switch to X Layer Testnet before future onchain actions."} tone={onXLayer ? "green" : isConnected ? "amber" : "slate"} />
-        <StatusCard eyebrow="Agent System" title="Foundation Mode" detail="Autonomous management is not active. This phase establishes wallet, chain, and security foundations only." tone="slate" />
+        <StatusCard eyebrow="Agent System" title="Portfolio Intelligence" detail="Read-only supported-asset balances and deterministic reference valuation. Autonomous management is not active." tone="slate" />
       </section>
+      <section className="pb-16"><PortfolioDashboard /></section>
     </main>
   );
 }

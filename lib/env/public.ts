@@ -7,6 +7,11 @@ const schema = z.object({
   NEXT_PUBLIC_TEST_USDT0_ADDRESS: z.string().regex(/^0x[a-fA-F0-9]{40}$/, "Must be a valid EVM address").default("0x9e29b3aada05bf2d2c827af80bd28dc0b9b4fb0c"),
   NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: z.string().trim().min(1).optional(),
   NEXT_PUBLIC_BUILDER_CODE: z.string().trim().min(1).optional(),
+  NEXT_PUBLIC_ADAPTARA_FACTORY_ADDRESS: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  NEXT_PUBLIC_ADAPTARA_ASSET_REGISTRY_ADDRESS: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  NEXT_PUBLIC_STRSY_ADDRESS: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  NEXT_PUBLIC_SXAU_ADDRESS: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
+  NEXT_PUBLIC_SAAPLX_ADDRESS: z.string().regex(/^0x[a-fA-F0-9]{40}$/).optional(),
 });
 
 export type PublicEnv = z.infer<typeof schema>;
@@ -22,4 +27,9 @@ export const publicEnv = parsePublicEnv({
   NEXT_PUBLIC_TEST_USDT0_ADDRESS: process.env.NEXT_PUBLIC_TEST_USDT0_ADDRESS,
   NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID: process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID,
   NEXT_PUBLIC_BUILDER_CODE: process.env.NEXT_PUBLIC_BUILDER_CODE,
+  NEXT_PUBLIC_ADAPTARA_FACTORY_ADDRESS: process.env.NEXT_PUBLIC_ADAPTARA_FACTORY_ADDRESS,
+  NEXT_PUBLIC_ADAPTARA_ASSET_REGISTRY_ADDRESS: process.env.NEXT_PUBLIC_ADAPTARA_ASSET_REGISTRY_ADDRESS,
+  NEXT_PUBLIC_STRSY_ADDRESS: process.env.NEXT_PUBLIC_STRSY_ADDRESS,
+  NEXT_PUBLIC_SXAU_ADDRESS: process.env.NEXT_PUBLIC_SXAU_ADDRESS,
+  NEXT_PUBLIC_SAAPLX_ADDRESS: process.env.NEXT_PUBLIC_SAAPLX_ADDRESS,
 });

@@ -1,6 +1,6 @@
 # Adaptara
 
-Phase 2 vault and onchain security foundation for a policy-bounded AI wealth agent for tokenized real-world assets on X Layer Testnet.
+Phase 3 read-only portfolio intelligence foundation for a policy-bounded AI wealth agent for tokenized real-world assets on X Layer Testnet.
 
 ## Quick start
 
@@ -14,4 +14,4 @@ Phase 2 vault and onchain security foundation for a policy-bounded AI wealth age
 
 Use `npm run check`, or run `lint`, `typecheck`, `test`, `build`, and `test:contracts` separately. Unit tests do not use a live RPC.
 
-This is experimental hackathon software for testnet assets only. Phase 2 provides isolated vault custody and authorization boundaries but no autonomous investment or execution functionality.
+This is experimental hackathon software for testnet assets only. Phase 3 reads Adaptara-supported wallet and vault holdings and applies clearly labeled deterministic demo reference prices. It provides no autonomous investment, execution, recommendation, or live-market functionality.

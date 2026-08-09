@@ -37,3 +37,13 @@ Anyone can transfer ERC-20 balances directly into a vault without calling `depos
 12. User vaults are isolated per user, not pooled.
 
 Phase 2 is testnet-only, includes custody and authorization foundations but no management or trading logic, and makes no production-security claim.
+
+## Phase 3 read-only portfolio security
+
+The portfolio module performs public reads only. It has no transaction, approval, signature, executor-key, or contract-write authority. A failed RPC or token read is an explicit unavailable/error state and is never represented as a zero balance, because zero is valid financial data. Deployed token decimals are checked against expected product metadata; mismatches fail closed as configuration errors.
+
+A configured asset with a failed read or configuration error has an unknown balance and prevents a complete valuation. Known zero remains distinct and does not degrade completeness. Assets without deployed/configured addresses are outside live onchain completeness rather than being treated as unreadable balances. Partial totals are valued subtotals only, and allocation BPS are withheld unless the entire supported portfolio is fully valued. A future Risk Engine must reject or explicitly degrade any calculation that requires complete portfolio valuation; no Risk Engine is implemented in Phase 3.
+
+Portfolio discovery covers only the configured Adaptara-supported catalog. Unsolicited tokens can exist in wallets and vaults but are not enumerated or silently treated as supported exposure. Wallet and vault sources are displayed separately, and onchain balances remain authoritative.
+
+`baselineRiskTier` is static product/registry metadata. A future adaptive current tier belongs to the Phase 4 Risk Engine and is not calculated here. Demo reference prices are deterministic development inputs, not live market truth, peg verification, performance data, or investment advice.

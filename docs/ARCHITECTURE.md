@@ -18,6 +18,26 @@ The registry allowlist is administered separately with delayed default-admin tra
 
 Phase 2 contains no execution router, exchange, oracle, valuation, AI, or trading mechanism. The executor address is stored to establish the future authorization boundary but has no privileged callable financial operation.
 
+## Portfolio Intelligence Layer
+
+```text
+Wallet / AdaptiveVault
+        ↓
+Supported Asset Catalog
+        ↓
+Onchain Balance Reader
+        ↓
+Reference Price Provider
+        ↓
+Deterministic Valuation Engine
+        ↓
+PortfolioSnapshot
+```
+
+Phase 3 queries only the configured Adaptara-supported asset set; it is not a comprehensive token index. Wallet and vault snapshots remain separate and retain account, source, chain, block, capture-time, read-status, and price-source provenance. Balance and decimals calls are batched at one captured block where supported by the RPC. Onchain `balanceOf` remains authoritative and no shadow accounting is introduced.
+
+The product catalog uses stable IDs rather than addresses as business identifiers. Addresses are environment-specific and optional. Static `baselineRiskTier` metadata remains distinct from the future dynamic risk engine. Reference pricing is behind an interface; the Phase 3 provider is explicitly demo-only and does not make oracle or peg claims.
+
 ## Intended later architecture
 
 ```text
