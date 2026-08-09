@@ -20,6 +20,10 @@ import type { OnchainConstitution } from "@/features/constitution/types";
 import type { MaraAnalysis } from "@/features/mara/types";
 import { buildMaraContext, maraAnalysisForContext, maraContextFingerprint, type ContextScopedMaraAnalysis } from "@/features/mara/context";
 import { AdaptationPlanPanel } from "@/features/adaptation/components/adaptation-plan";
+import { SentinelPanel } from "@/features/sentinel/components/sentinel-panel";
+import { overlaySentinelStress, riskAssessedAtWithSentinel, sentinelInfluencesPortfolioRisk } from "@/features/sentinel/effective-signals";
+import { sentinelAssessmentForContext, sentinelContextFingerprint } from "@/features/sentinel/context";
+import type { ContextScopedSentinelAssessment, SentinelAssessment } from "@/features/sentinel/types";
 
 const demoPrices = new DemoReferencePriceProvider();
 const displayNumber = (value: string) => { const [whole, fraction] = value.split("."); return `${BigInt(whole).toLocaleString()}${fraction ? `.${fraction.slice(0, 4)}` : ""}`; };
@@ -45,8 +49,14 @@ function PositionCard({ position }: { position: AssetPosition }) {
 }
 
 function SnapshotPanel({ title, snapshot, constitution }: { title: string; snapshot: PortfolioSnapshot; constitution?: OnchainConstitution }) {
-  const riskSignals = new Map(snapshot.positions.map((position) => [position.asset.id, getDemoRiskSignals(position.asset.id)]));
-  const riskAssessment = calculatePortfolioRisk(snapshot, riskSignals, snapshot.capturedAt);
+  const sentinelContext = sentinelContextFingerprint(snapshot);
+  const [sentinelResult, setSentinelResult] = useState<ContextScopedSentinelAssessment | null>(null);
+  const handleSentinelAssessment = useCallback((assessment: SentinelAssessment, contextKey: string) => setSentinelResult({ contextKey, assessment }), []);
+  const sentinelAssessment = sentinelAssessmentForContext(sentinelResult, sentinelContext);
+  const baseRiskSignals = new Map(snapshot.positions.map((position) => [position.asset.id, getDemoRiskSignals(position.asset.id)]));
+  const sentinelInfluence = sentinelInfluencesPortfolioRisk(snapshot, baseRiskSignals, sentinelAssessment);
+  const riskSignals = overlaySentinelStress(baseRiskSignals, sentinelAssessment);
+  const riskAssessment = calculatePortfolioRisk(snapshot, riskSignals, riskAssessedAtWithSentinel(snapshot, baseRiskSignals, sentinelAssessment));
   const currentMaraContext = maraContextFingerprint(snapshot, riskAssessment);
   const [maraResult, setMaraResult] = useState<ContextScopedMaraAnalysis | null>(null);
   const handleMaraAnalysis = useCallback((value: MaraAnalysis | null, contextKey: string) => { if (value) setMaraResult({ contextKey, analysis: value }); }, []);
@@ -72,7 +82,8 @@ function SnapshotPanel({ title, snapshot, constitution }: { title: string; snaps
     {snapshot.valuationStatus === "unavailable" && snapshot.totals.unknownBalanceAssetCount > 0 ? <p role="alert" className="mt-4 rounded-xl bg-red-50 p-3 text-sm text-red-800">Portfolio value is unavailable because one or more configured balances could not be read or verified.</p> : null}
     {snapshot.totals.nonzeroAssetCount === 0 && snapshot.totals.unknownBalanceAssetCount === 0 ? <p className="mt-4 text-sm text-[var(--muted)]">No supported token balances were found for this source.</p> : null}
     <div className="mt-5 grid gap-3">{snapshot.positions.map((position) => <PositionCard key={position.asset.id} position={position} />)}</div>
-    <RiskIntelligence assessment={riskAssessment} />
+    <SentinelPanel snapshot={snapshot} assessment={sentinelAssessment} onAssessmentChange={handleSentinelAssessment} />
+    <RiskIntelligence assessment={riskAssessment} sentinelInfluence={sentinelInfluence} />
     <MaraPanel snapshot={snapshot} assessment={riskAssessment} onAnalysisChange={snapshot.source === "vault" ? handleMaraAnalysis : undefined} />
     {snapshot.source === "vault" ? <AdaptationPlanPanel snapshot={snapshot} assessment={riskAssessment} constitution={constitution} analysis={maraAnalysis} facts={buildMaraContext(snapshot, riskAssessment).facts} /> : null}
   </section>;

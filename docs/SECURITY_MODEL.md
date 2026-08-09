@@ -68,3 +68,9 @@ Exact validation and current-catalog feasibility checks fail closed before a wal
 MARA supplies direction but never chooses BPS. The deterministic engine never signs or sends transactions and accepts only an active onchain constitution for operational planning. Both current and target vault allocations must be compliant; a violating baseline blocks normal MARA-directed adaptation rather than being silently repaired.
 
 Only the first actionable MARA proposal is converted, using one donor, one receiver, canonical tie-breaks, and a 500-BPS application safety throttle further constrained by policy. `maximumDailyReallocationBps` is a per-plan ceiling here, not cumulative daily accounting. Portfolio, MARA, vault/account, and constitution provenance changes invalidate visible state. Future execution must reread authoritative state, account for cumulative daily activity, and independently revalidate every constraint.
+
+## Phase 8 Sentinel boundary
+
+News and events are untrusted inputs. Phase 8 accepts bounded canonical observations and fixed categorical severity; a provider cannot supply BPS. Two distinct sources must corroborate the same event key and asset. Duplicate same-source and expired reports have no risk influence. Stress affects only market/event stress, uses max aggregation, and never lowers the base signal.
+
+Sentinel cannot invoke MARA or adaptation and cannot sign or send transactions. Scan completions are context-isolated. The feed is demo/non-live and fetches no URLs. A future live provider requires separate SSRF, provenance, source-trust, privacy, and availability review.

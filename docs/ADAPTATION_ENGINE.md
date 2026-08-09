@@ -25,3 +25,5 @@ The independent validator checks integer BPS, the exact authoritative asset map 
 Plans preserve vault, chain, portfolio block, constitution block, selected MARA proposal/action/asset, evidence references, and constitution limits. Portfolio and constitution reads are not called same-block unless they are. Portfolio, MARA, risk, vault/account, or constitution provenance changes clear visible advice or plans.
 
 Phase 7 creates no token quantities, trades, routes, approvals, calldata, execution timing, or future-risk prediction. Future execution must reread authoritative chain state, implement authoritative cumulative daily accounting, and independently revalidate the plan.
+
+A Phase 8 event-driven risk change invalidates prior MARA and adaptation context keys. Old plans are not mutated or presented as current. Sentinel does not create plans; the user must explicitly rerun MARA and explicitly generate a new simulation.

@@ -23,3 +23,5 @@ Only a `valued` Phase 3 snapshot with meaningful nonzero holdings, non-null allo
 Malformed, fractional, negative, or above-maximum inputs fail closed; values are never clamped. The demo provider uses fixed values, makes no network calls, and has no randomness or time-dependent scoring.
 
 Risk Engine output is advisory data. It cannot move funds. Future execution must independently pass policy, contract, and oracle validation. MARA cannot define weights or mutate an assessment; changed inputs require a new assessment.
+
+In Phase 8, market/event stress may be `max(existing base event stress, active corroborated Sentinel event stress)`. The demo/non-live overlay cannot reduce base risk and changes no weights, contribution math, concentration, thresholds, or other factor.

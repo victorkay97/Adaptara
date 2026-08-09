@@ -104,3 +104,16 @@ NO EXECUTION IN PHASE 7
 The engine creates at most one exact-BPS donor-to-receiver allocation simulation. It has no signer, wallet client, transaction, token quantity, calldata, route, or execution authority.
 
 Future only, not implemented: `Validated Allocation Plan -> future execution validation -> future permitted X Layer transaction`.
+
+## Phase 8 Sentinel
+
+```text
+Demo/non-live event observations
+       -> Sentinel validation and corroboration
+       -> deterministic event stress
+       -> Phase 4 risk engine
+       -> MARA (explicit user action)
+       -> Phase 7 deterministic simulation (explicit user action)
+```
+
+Sentinel has no wallet, signer, contract, transaction, MARA-call, or adaptation-plan authority.
