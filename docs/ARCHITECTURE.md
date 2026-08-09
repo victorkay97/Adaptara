@@ -117,3 +117,14 @@ Demo/non-live event observations
 ```
 
 Sentinel has no wallet, signer, contract, transaction, MARA-call, or adaptation-plan authority.
+
+## Phase 9 Yield Intelligence
+
+```text
+Authoritative vault PortfolioSnapshot
+       -> canonical demo yield terms
+       -> user-triggered deterministic compounding simulation
+       -> token-unit projection (execution authority: none)
+```
+
+Yield Intelligence is a side simulation only. It never writes a projected balance back into the current portfolio and never fabricates future chain state. It is independent of Risk, Sentinel, MARA, the Financial Constitution, and Adaptation state.

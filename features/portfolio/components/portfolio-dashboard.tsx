@@ -24,6 +24,7 @@ import { SentinelPanel } from "@/features/sentinel/components/sentinel-panel";
 import { overlaySentinelStress, riskAssessedAtWithSentinel, sentinelInfluencesPortfolioRisk } from "@/features/sentinel/effective-signals";
 import { sentinelAssessmentForContext, sentinelContextFingerprint } from "@/features/sentinel/context";
 import type { ContextScopedSentinelAssessment, SentinelAssessment } from "@/features/sentinel/types";
+import { YieldPanel } from "@/features/yield/components/yield-panel";
 
 const demoPrices = new DemoReferencePriceProvider();
 const displayNumber = (value: string) => { const [whole, fraction] = value.split("."); return `${BigInt(whole).toLocaleString()}${fraction ? `.${fraction.slice(0, 4)}` : ""}`; };
@@ -46,6 +47,17 @@ function PositionCard({ position }: { position: AssetPosition }) {
     </dl>
     <p className="mt-4 text-xs text-[var(--muted)]">{statusCopy[position.availability]}{position.error ? ` · ${position.error}` : ""}{position.referencePrice ? " · Demo reference (non-live)" : ""}</p>
   </article>;
+}
+
+export const shouldShowYieldIntelligence = (source: PortfolioSnapshot["source"]): boolean => source === "vault";
+
+export function VaultUnavailablePanel({ message, role }: { message: string; role?: "alert" | "status" }) {
+  return <div className="grid gap-6">
+    <div className={`rounded-3xl border border-[var(--line)] p-8 ${role === "alert" ? "bg-red-50 text-red-800" : "bg-white/70"}`} role={role}>
+      <h2 className="text-2xl font-semibold">Adaptara Vault</h2><p className="mt-3">{message}</p>
+    </div>
+    <YieldPanel />
+  </div>;
 }
 
 function SnapshotPanel({ title, snapshot, constitution }: { title: string; snapshot: PortfolioSnapshot; constitution?: OnchainConstitution }) {
@@ -86,6 +98,7 @@ function SnapshotPanel({ title, snapshot, constitution }: { title: string; snaps
     <RiskIntelligence assessment={riskAssessment} sentinelInfluence={sentinelInfluence} />
     <MaraPanel snapshot={snapshot} assessment={riskAssessment} onAnalysisChange={snapshot.source === "vault" ? handleMaraAnalysis : undefined} />
     {snapshot.source === "vault" ? <AdaptationPlanPanel snapshot={snapshot} assessment={riskAssessment} constitution={constitution} analysis={maraAnalysis} facts={buildMaraContext(snapshot, riskAssessment).facts} /> : null}
+    {shouldShowYieldIntelligence(snapshot.source) ? <YieldPanel snapshot={snapshot} /> : null}
   </section>;
 }
 
@@ -108,7 +121,7 @@ export function PortfolioDashboard() {
   if (!onXLayer) return <section className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center"><h2 className="text-2xl font-semibold">Wrong network</h2><p className="mt-3 text-amber-900">Switch to X Layer Testnet to read supported portfolio balances.</p></section>;
   return <div className="grid gap-6">
     {wallet.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Reading wallet balances…</p> : wallet.isError ? <p className="rounded-3xl bg-red-50 p-8 text-red-800" role="alert">Wallet portfolio unavailable: {wallet.error.message}</p> : wallet.data ? <SnapshotPanel title="Your Wallet" snapshot={wallet.data} /> : null}
-    <section>{vault.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Discovering Adaptara Vault…</p> : vault.data?.status === "not-configured" ? <div className="rounded-3xl border border-[var(--line)] bg-white/70 p-8"><h2 className="text-2xl font-semibold">Adaptara Vault</h2><p className="mt-3 text-[var(--muted)]">Vault integration not deployed yet.</p></div> : vault.data?.status === "not-created" ? <div className="rounded-3xl border border-[var(--line)] bg-white/70 p-8"><h2 className="text-2xl font-semibold">Adaptara Vault</h2><p className="mt-3 text-[var(--muted)]">No Adaptara Vault found.</p></div> : vault.data?.status === "read-error" ? <p className="rounded-3xl bg-red-50 p-8 text-red-800" role="alert">Vault discovery unavailable: {vault.data.error}</p> : vaultPortfolio.isPending ? <p className="rounded-3xl bg-white/70 p-8">Reading vault balances…</p> : vaultPortfolio.data ? <SnapshotPanel title="Adaptara Vault" snapshot={vaultPortfolio.data} constitution={activeConstitution ?? undefined} /> : null}</section>
+    <section>{vault.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Discovering Adaptara Vault…</p> : vault.data?.status === "not-configured" ? <VaultUnavailablePanel message="Vault integration not deployed yet." /> : vault.data?.status === "not-created" ? <VaultUnavailablePanel message="No Adaptara Vault found." /> : vault.data?.status === "read-error" ? <VaultUnavailablePanel message={`Vault discovery unavailable: ${vault.data.error}`} role="alert" /> : vaultPortfolio.isPending ? <p className="rounded-3xl bg-white/70 p-8">Reading vault balances…</p> : vaultPortfolio.isError ? <VaultUnavailablePanel message={`Vault portfolio unavailable: ${vaultPortfolio.error.message}`} role="alert" /> : vaultPortfolio.data ? <SnapshotPanel title="Adaptara Vault" snapshot={vaultPortfolio.data} constitution={activeConstitution ?? undefined} /> : null}</section>
     {client && vault.data ? <FinancialConstitutionPanel key={`${address}:${vault.data.status === "available" ? vault.data.address : "no-vault"}`} address={address} client={client} vault={vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : wallet.data} onActiveChange={handleActiveConstitution} /> : null}
   </div>;
 }

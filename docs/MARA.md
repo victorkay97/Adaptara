@@ -21,3 +21,5 @@ MARA may explain supplied risk state, identify grounded observations and uncerta
 Phase 7 may consume an already-validated MARA proposal as directional input. MARA still does not choose exact BPS, target allocations, quantities, routes, or timing, and its `executionAuthority` remains `none`.
 
 Phase 8 Sentinel may change deterministic risk grounding. This changes the MARA context fingerprint, so prior advice is stale and hidden. Sentinel never calls MARA; the user must explicitly select **Analyze with MARA** again.
+
+Phase 9 yield projections are not automatically supplied to MARA. Running or changing a hypothetical compounding simulation does not change authoritative portfolio/risk context and does not cause MARA to rerun or become stale.

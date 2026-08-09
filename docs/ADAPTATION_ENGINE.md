@@ -27,3 +27,5 @@ Plans preserve vault, chain, portfolio block, constitution block, selected MARA 
 Phase 7 creates no token quantities, trades, routes, approvals, calldata, execution timing, or future-risk prediction. Future execution must reread authoritative chain state, implement authoritative cumulative daily accounting, and independently revalidate the plan.
 
 A Phase 8 event-driven risk change invalidates prior MARA and adaptation context keys. Old plans are not mutated or presented as current. Sentinel does not create plans; the user must explicitly rerun MARA and explicitly generate a new simulation.
+
+Phase 9 hypothetical yield projections do not alter the current portfolio or adaptation context, do not invalidate an existing plan, and do not create an Adaptation Plan.

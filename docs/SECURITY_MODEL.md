@@ -74,3 +74,9 @@ Only the first actionable MARA proposal is converted, using one donor, one recei
 News and events are untrusted inputs. Phase 8 accepts bounded canonical observations and fixed categorical severity; a provider cannot supply BPS. Two distinct sources must corroborate the same event key and asset. Duplicate same-source and expired reports have no risk influence. Stress affects only market/event stress, uses max aggregation, and never lowers the base signal.
 
 Sentinel cannot invoke MARA or adaptation and cannot sign or send transactions. Scan completions are context-isolated. The feed is demo/non-live and fetches no URLs. A future live provider requires separate SSRF, provenance, source-trust, privacy, and availability review.
+
+## Phase 9 yield-simulation boundary
+
+Fixture yield terms are transparent demo inputs, not market or protocol truth. The canonical provider, rather than user input, supplies the rate. Projection uses deterministic, round-down `BigInt` arithmetic and never creates a fake future `PortfolioSnapshot`.
+
+Yield Intelligence has no signer, transaction, protocol adapter, network, or arbitrary execution surface and cannot change risk, Sentinel, MARA, Constitution, or Adaptation authority. Future real yield protocols require separate adapter design and security review.
