@@ -1,6 +1,9 @@
 import type { PortfolioSnapshot } from "@/features/portfolio/types";
 import type { PortfolioRiskAssessment } from "@/features/risk/types";
-import type { MaraContext, MaraGroundingFact } from "./types";
+import type { MaraAnalysis, MaraContext, MaraGroundingFact } from "./types";
+
+export interface ContextScopedMaraAnalysis { contextKey: string; analysis: MaraAnalysis }
+export const maraAnalysisForContext = (result: ContextScopedMaraAnalysis | null, contextKey: string): MaraAnalysis | null => result?.contextKey === contextKey ? result.analysis : null;
 
 export function buildMaraContext(snapshot: PortfolioSnapshot, risk: PortfolioRiskAssessment): MaraContext {
   const facts: MaraGroundingFact[] = [
@@ -21,4 +24,14 @@ export function buildMaraContext(snapshot: PortfolioSnapshot, risk: PortfolioRis
   }
   const limitations = [...new Set([...(snapshot.priceSources.length ? [`Portfolio reference prices are ${snapshot.priceSources.join("/")} data, not live market truth.`] : []), ...(risk.signalSources.length ? [`Risk signals are ${risk.signalSources.join("/")} data, not live market truth.`] : [])])];
   return { contextVersion: "phase-5.v1", portfolioSource: snapshot.source, portfolioStatus: snapshot.valuationStatus, riskStatus: risk.status, facts, limitations, capturedAt: snapshot.capturedAt, assessedAt: risk.assessedAt };
+}
+
+export function maraContextFingerprint(snapshot: PortfolioSnapshot, risk: PortfolioRiskAssessment): string {
+  return JSON.stringify({
+    source: snapshot.source,
+    accountAddress: snapshot.accountAddress,
+    chainId: snapshot.chainId,
+    blockNumber: snapshot.blockNumber?.toString() ?? null,
+    context: buildMaraContext(snapshot, risk),
+  });
 }

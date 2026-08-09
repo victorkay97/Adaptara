@@ -88,4 +88,19 @@ AdaptiveVault -> Onchain Constitution Reader
 
 The constitution module depends on portfolio/catalog facts; portfolio, risk, and MARA do not depend on constitution. Existing `AdaptiveVault.policy` is canonical when a vault exists. Reads are direct and pinned to one X Layer block without Multicall3. Drafts are local and non-authoritative. The sole write is the explicit owner-wallet `setPolicy` call after validation and confirmation.
 
-Future, not implemented in Phase 6: `MARA advisory proposals + Financial Constitution -> Phase 7 Adaptation Engine`.
+## Phase 7 deterministic adaptation
+
+```text
+PortfolioSnapshot + Risk Assessment + MARA Advisory
+       + Active Onchain Constitution
+       ↓
+Deterministic Adaptation Engine
+       ↓
+Validated Allocation Plan
+       ↓
+NO EXECUTION IN PHASE 7
+```
+
+The engine creates at most one exact-BPS donor-to-receiver allocation simulation. It has no signer, wallet client, transaction, token quantity, calldata, route, or execution authority.
+
+Future only, not implemented: `Validated Allocation Plan -> future execution validation -> future permitted X Layer transaction`.

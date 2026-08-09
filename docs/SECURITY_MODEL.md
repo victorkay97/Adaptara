@@ -62,3 +62,9 @@ MARA and OpenAI have zero wallet and transaction authority. MARA receives privac
 The Financial Constitution belongs to the vault owner. Only an explicit owner wallet signature may change canonical `AdaptiveVault.policy`; MARA and the server cannot sign, and the guardian and agent executor retain no policy authority under the existing contract. Local drafts are non-authoritative. Failed policy or owner reads never become default values, and uncertainty disables writes.
 
 Exact validation and current-catalog feasibility checks fail closed before a wallet request. These checks are defense in depth; the contract remains the authorization boundary. Confirmation is required before success is displayed, followed by an onchain reread. Phase 6 provides no autonomous execution. Future execution must enforce the canonical constitution independently.
+
+## Phase 7 adaptation boundary
+
+MARA supplies direction but never chooses BPS. The deterministic engine never signs or sends transactions and accepts only an active onchain constitution for operational planning. Both current and target vault allocations must be compliant; a violating baseline blocks normal MARA-directed adaptation rather than being silently repaired.
+
+Only the first actionable MARA proposal is converted, using one donor, one receiver, canonical tie-breaks, and a 500-BPS application safety throttle further constrained by policy. `maximumDailyReallocationBps` is a per-plan ceiling here, not cumulative daily accounting. Portfolio, MARA, vault/account, and constitution provenance changes invalidate visible state. Future execution must reread authoritative state, account for cumulative daily activity, and independently revalidate every constraint.

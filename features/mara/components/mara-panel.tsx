@@ -1,28 +1,46 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import type { PortfolioSnapshot } from "@/features/portfolio/types";
 import type { PortfolioRiskAssessment } from "@/features/risk/types";
-import { buildMaraContext } from "../context";
+import { buildMaraContext, maraContextFingerprint } from "../context";
 import type { MaraAnalysis, MaraGroundingFact } from "../types";
 
 const evidenceLabel = (ref: string, facts: MaraGroundingFact[]) => facts.find((fact) => fact.id === ref)?.label ?? "Grounding evidence";
 const ACTION_LABELS = { maintain: "Maintain and monitor", review: "Review exposure", increase_reserve: "Evaluate higher reserves", reduce_exposure: "Evaluate lower exposure", diversify: "Evaluate diversification" } as const;
+export const acceptMaraResultForContext = (startedContext: string, currentContext: string, analysis: MaraAnalysis): MaraAnalysis | null => startedContext === currentContext ? analysis : null;
+export type MaraRequestStatus = "idle" | "loading" | "error" | "config";
+export interface MaraRequestState { contextKey: string; status: MaraRequestStatus }
+export const maraRequestStatusForContext = (request: MaraRequestState | null, contextKey: string): MaraRequestStatus => request?.contextKey === contextKey ? request.status : "idle";
+export const maraCompletionForContext = <T,>(startedContext: string, currentContext: string, value: T): T | null => startedContext === currentContext ? value : null;
 
-export function MaraPanel({ snapshot, assessment }: { snapshot: PortfolioSnapshot; assessment: PortfolioRiskAssessment }) {
+export function MaraPanel({ snapshot, assessment, onAnalysisChange }: { snapshot: PortfolioSnapshot; assessment: PortfolioRiskAssessment; onAnalysisChange?: (analysis: MaraAnalysis | null, contextKey: string) => void }) {
   const [question, setQuestion] = useState("");
-  const [analysis, setAnalysis] = useState<MaraAnalysis | null>(null);
-  const [state, setState] = useState<"idle" | "loading" | "error" | "config">("idle");
+  const [result, setResult] = useState<{ contextKey: string; analysis: MaraAnalysis } | null>(null);
+  const [request, setRequest] = useState<MaraRequestState | null>(null);
   const context = buildMaraContext(snapshot, assessment);
+  const contextKey = maraContextFingerprint(snapshot, assessment);
+  const contextRef = useRef(contextKey);
+  // The latest rendered authority context must be visible before effects run.
+  // eslint-disable-next-line react-hooks/refs
+  contextRef.current = contextKey;
+  useEffect(() => { onAnalysisChange?.(null, contextKey); }, [contextKey, onAnalysisChange]);
+  const analysis = result?.contextKey === contextKey ? result.analysis : null;
+  const state = maraRequestStatusForContext(request, contextKey);
   const complete = snapshot.valuationStatus === "valued" && assessment.status === "assessed";
   async function analyze() {
-    setState("loading"); setAnalysis(null);
+    const startedContext = contextKey;
+    setRequest({ contextKey: startedContext, status: "loading" }); setResult(null); onAnalysisChange?.(null, contextKey);
     try {
       const response = await fetch("/api/mara/analyze", { method: "POST", headers: { "content-type": "application/json" }, body: JSON.stringify({ context, question: question.trim() || null }) });
       const data = await response.json() as { analysis?: MaraAnalysis; code?: string };
-      if (!response.ok || !data.analysis) { setState(data.code === "not-configured" ? "config" : "error"); return; }
-      setAnalysis(data.analysis); setState("idle");
-    } catch { setState("error"); }
+      const currentData = maraCompletionForContext(startedContext, contextRef.current, data);
+      if (!currentData) return;
+      if (!response.ok || !currentData.analysis) { setRequest({ contextKey: startedContext, status: currentData.code === "not-configured" ? "config" : "error" }); return; }
+      const accepted = acceptMaraResultForContext(startedContext, contextRef.current, currentData.analysis);
+      if (!accepted) return;
+      setResult({ contextKey: startedContext, analysis: accepted }); onAnalysisChange?.(accepted, startedContext); setRequest({ contextKey: startedContext, status: "idle" });
+    } catch { if (maraCompletionForContext(startedContext, contextRef.current, "error")) setRequest({ contextKey: startedContext, status: "error" }); }
   }
   return <section className="mt-6 rounded-2xl border border-[#b9c9e8] bg-[#f5f7fc] p-5" aria-label="MARA">
     <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#405f9b]">MARA</p><h3 className="mt-2 text-xl font-semibold">Market Adaptive Risk Agent</h3><p className="mt-2 text-sm text-[var(--muted)]">AI interpretation of Adaptara&apos;s deterministic portfolio and risk data.</p></div>

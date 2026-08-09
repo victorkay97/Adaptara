@@ -34,7 +34,7 @@ export function commitConfirmedConstitution(queryClient: QueryClient, queryKey: 
   return startedContext === currentContext ? applyConfirmedConstitution(confirmed) : null;
 }
 
-export function FinancialConstitutionPanel({ address, client, vault, snapshot }: { address: Address; client: PublicClient; vault: VaultDiscovery; snapshot?: PortfolioSnapshot }) {
+export function FinancialConstitutionPanel({ address, client, vault, snapshot, onActiveChange }: { address: Address; client: PublicClient; vault: VaultDiscovery; snapshot?: PortfolioSnapshot; onActiveChange?: (constitution: OnchainConstitution | null) => void }) {
   const vaultAddress = vault.status === "available" ? vault.address : undefined;
   const contextId = constitutionContextId(address, vaultAddress);
   const contextRef = useRef(contextId);
@@ -51,6 +51,7 @@ export function FinancialConstitutionPanel({ address, client, vault, snapshot }:
   const reset = (policy: FinancialConstitution) => { setDraft(policy); setInputs(inputStrings(policy)); setErrors({}); };
   useEffect(() => { const fresh=freshConstitutionContextState(); setDraft(fresh.draft); setInputs(fresh.inputs); setErrors(fresh.errors); setTx(fresh.tx); setSaving(fresh.saving); }, [contextId]);
   useEffect(() => { if (onchain.data) reset(onchain.data.constitution); }, [onchain.data]);
+  useEffect(() => { onActiveChange?.(onchain.data ?? null); }, [contextId, onchain.data, onActiveChange]);
 
   const validation = validateConstitution(draft);
   const feasibility = validation.valid ? evaluateConstitutionFeasibility(draft, ASSET_CATALOG) : null;

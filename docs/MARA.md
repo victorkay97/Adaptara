@@ -17,3 +17,5 @@ The official OpenAI SDK calls the Responses API only on the server. `OPENAI_API_
 The optional question is trimmed, limited to 1,000 characters, encoded as untrusted structured user data, and cannot select policy, model, schema, key, or tools. In Phase 5 there is no web/news/document ingestion, persistent memory, managed conversation, `previous_response_id`, or background agent.
 
 MARA may explain supplied risk state, identify grounded observations and uncertainty, and offer directional advisory ideas. It may not invent facts or scores, recalculate risk, predict returns, specify target weights, issue transaction instructions, sign, or execute. Incomplete valuation or risk assessment is rejected before a model call. Future execution must independently re-read chain state and validate policy.
+
+Phase 7 may consume an already-validated MARA proposal as directional input. MARA still does not choose exact BPS, target allocations, quantities, routes, or timing, and its `executionAuthority` remains `none`.

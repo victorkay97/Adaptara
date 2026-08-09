@@ -2,7 +2,7 @@
 
 Phase 6 defines the vault owner's deterministic portfolio-policy boundary. It is structured user input, not a MARA recommendation, trade instruction, or autonomous execution capability. The application representation is versioned `phase-6.v1`; Solidity storage is unchanged.
 
-All four values are integer basis points from 0 through 10,000. `minimumReserveBps` is the minimum aggregate allocation to baseline-Reserve assets. `maximumSingleAssetExposureBps` caps each supported asset. `maximumAggressiveExposureBps` caps aggregate baseline-Aggressive assets. `maximumDailyReallocationBps` is a future action limit and cannot be evaluated from current holdings alone. Baseline catalog classification is deliberately used; Phase 4's dynamic `currentRiskTier` is independent risk intelligence.
+All four values are integer basis points from 0 through 10,000. `minimumReserveBps` is the minimum aggregate allocation to baseline-Reserve assets. `maximumSingleAssetExposureBps` caps each supported asset. `maximumAggressiveExposureBps` caps aggregate baseline-Aggressive assets. `maximumDailyReallocationBps` constrains each Phase 7 simulation plan. Cumulative daily execution accounting still does not exist because Phase 7 performs no execution. Baseline catalog classification is deliberately used; Phase 4's dynamic `currentRiskTier` is independent risk intelligence.
 
 Zero is literal, never “unset”: a zero reserve minimum imposes no minimum; zero single-asset or aggressive maximum permits no such exposure; and zero daily reallocation permits no reallocation. At 10,000, the maximum rules permit up to the full portfolio and the reserve minimum requires the full portfolio.
 
@@ -10,7 +10,7 @@ Validity, feasibility, and compliance are separate. Validity checks exact fields
 
 A draft is local UI state and is labeled `Draft · not active onchain`. When a vault exists, its `AdaptiveVault.policy` values are canonical. Direct reads of policy and owner are pinned to one X Layer block and failures are never replaced with zero defaults. Only the connected vault owner can explicitly call `setPolicy`; the app validates validity and feasibility, requests a wallet signature, waits for a successful receipt, and rereads chain state. The contract remains final authorization.
 
-MARA, guardian, executor, and server have no constitution mutation authority. Phase 6 adds no private signer, arbitrary call path, trade, or autonomous rebalancing. The existing contract stores but does not yet enforce policy against executions because routing and valuation enforcement do not exist. Phase 7 may consume MARA advisory proposals plus this canonical policy through deterministic adaptation validation; Phase 7 is not implemented here.
+MARA, guardian, executor, and server have no constitution mutation authority. Phase 6 adds no private signer, arbitrary call path, trade, or autonomous rebalancing. The existing contract stores but does not yet enforce policy against executions because routing and valuation enforcement do not exist. Phase 7 consumes MARA advisory direction plus this canonical policy through deterministic validation and produces simulation-only allocation plans with no execution authority.
 
 ## Manual smoke checks
 
