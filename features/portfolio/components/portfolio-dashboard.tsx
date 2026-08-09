@@ -14,6 +14,7 @@ import { RiskIntelligence } from "@/features/risk/components/risk-intelligence";
 import { calculatePortfolioRisk } from "@/features/risk/portfolio-risk";
 import { getDemoRiskSignals } from "@/features/risk/signals";
 import { MaraPanel } from "@/features/mara/components/mara-panel";
+import { FinancialConstitutionPanel } from "@/features/constitution/components/financial-constitution";
 
 const demoPrices = new DemoReferencePriceProvider();
 const displayNumber = (value: string) => { const [whole, fraction] = value.split("."); return `${BigInt(whole).toLocaleString()}${fraction ? `.${fraction.slice(0, 4)}` : ""}`; };
@@ -85,5 +86,6 @@ export function PortfolioDashboard() {
   return <div className="grid gap-6">
     {wallet.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Reading wallet balances…</p> : wallet.isError ? <p className="rounded-3xl bg-red-50 p-8 text-red-800" role="alert">Wallet portfolio unavailable: {wallet.error.message}</p> : wallet.data ? <SnapshotPanel title="Your Wallet" snapshot={wallet.data} /> : null}
     <section>{vault.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Discovering Adaptara Vault…</p> : vault.data?.status === "not-configured" ? <div className="rounded-3xl border border-[var(--line)] bg-white/70 p-8"><h2 className="text-2xl font-semibold">Adaptara Vault</h2><p className="mt-3 text-[var(--muted)]">Vault integration not deployed yet.</p></div> : vault.data?.status === "not-created" ? <div className="rounded-3xl border border-[var(--line)] bg-white/70 p-8"><h2 className="text-2xl font-semibold">Adaptara Vault</h2><p className="mt-3 text-[var(--muted)]">No Adaptara Vault found.</p></div> : vault.data?.status === "read-error" ? <p className="rounded-3xl bg-red-50 p-8 text-red-800" role="alert">Vault discovery unavailable: {vault.data.error}</p> : vaultPortfolio.isPending ? <p className="rounded-3xl bg-white/70 p-8">Reading vault balances…</p> : vaultPortfolio.data ? <SnapshotPanel title="Adaptara Vault" snapshot={vaultPortfolio.data} /> : null}</section>
+    {client && vault.data ? <FinancialConstitutionPanel key={`${address}:${vault.data.status === "available" ? vault.data.address : "no-vault"}`} address={address} client={client} vault={vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : wallet.data} /> : null}
   </div>;
 }

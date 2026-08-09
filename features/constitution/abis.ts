@@ -1,0 +1,2 @@
+import { parseAbi } from "viem";
+export const adaptiveVaultConstitutionAbi = parseAbi(["function owner() view returns (address)", "function policy() view returns (uint16 minimumReserveBps, uint16 maximumSingleAssetExposureBps, uint16 maximumAggressiveExposureBps, uint16 maximumDailyReallocationBps)", "function setPolicy((uint16 minimumReserveBps, uint16 maximumSingleAssetExposureBps, uint16 maximumAggressiveExposureBps, uint16 maximumDailyReallocationBps) newPolicy)"]);

@@ -56,3 +56,9 @@ Weights and tier thresholds are fixed in typed engine configuration and tested; 
 # Phase 5 MARA boundary
 
 MARA and OpenAI have zero wallet and transaction authority. MARA receives privacy-minimized context, has no tools, and its output is untrusted until strict post-validation. User questions are untrusted input and cannot alter the server-owned policy, model, schema, or capabilities. Incomplete deterministic state cannot produce complete advice. Future execution must independently validate current chain state and policy.
+
+## Phase 6 constitution boundary
+
+The Financial Constitution belongs to the vault owner. Only an explicit owner wallet signature may change canonical `AdaptiveVault.policy`; MARA and the server cannot sign, and the guardian and agent executor retain no policy authority under the existing contract. Local drafts are non-authoritative. Failed policy or owner reads never become default values, and uncertainty disables writes.
+
+Exact validation and current-catalog feasibility checks fail closed before a wallet request. These checks are defense in depth; the contract remains the authorization boundary. Confirmation is required before success is displayed, followed by an onchain reread. Phase 6 provides no autonomous execution. Future execution must enforce the canonical constitution independently.

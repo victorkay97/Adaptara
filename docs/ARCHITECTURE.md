@@ -75,3 +75,17 @@ X Layer -> Portfolio Readers -> PortfolioSnapshot
 ```
 
 Dependencies remain `portfolio -> risk -> mara`; Portfolio and Risk do not import MARA. LLM interpretation is non-deterministic and advisory, while upstream facts remain authoritative.
+
+## Phase 6 Financial Constitution
+
+```text
+PortfolioSnapshot -> Financial Constitution Compliance
+
+AdaptiveVault -> Onchain Constitution Reader
+              -> Financial Constitution UI
+              -> Owner-signed policy update
+```
+
+The constitution module depends on portfolio/catalog facts; portfolio, risk, and MARA do not depend on constitution. Existing `AdaptiveVault.policy` is canonical when a vault exists. Reads are direct and pinned to one X Layer block without Multicall3. Drafts are local and non-authoritative. The sole write is the explicit owner-wallet `setPolicy` call after validation and confirmation.
+
+Future, not implemented in Phase 6: `MARA advisory proposals + Financial Constitution -> Phase 7 Adaptation Engine`.
