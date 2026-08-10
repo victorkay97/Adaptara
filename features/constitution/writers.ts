@@ -7,6 +7,13 @@ import { readVaultConstitution } from "./readers";
 import type { ConstitutionUpdateResult, FinancialConstitution } from "./types";
 import { validateConstitution } from "./validation";
 
+function policiesEqual(left: FinancialConstitution, right: FinancialConstitution): boolean {
+  return left.minimumReserveBps === right.minimumReserveBps
+    && left.maximumSingleAssetExposureBps === right.maximumSingleAssetExposureBps
+    && left.maximumAggressiveExposureBps === right.maximumAggressiveExposureBps
+    && left.maximumDailyReallocationBps === right.maximumDailyReallocationBps;
+}
+
 export async function updateVaultConstitution(params: { publicClient: PublicClient; walletClient: WalletClient; vaultAddress: Address; connectedAddress: Address; policy: FinancialConstitution; assets: readonly AssetMetadata[] }): Promise<ConstitutionUpdateResult> {
   const { publicClient, walletClient, vaultAddress, connectedAddress, policy, assets } = params;
   if (await publicClient.getChainId() !== XLAYER_TESTNET_CHAIN_ID || walletClient.chain?.id !== XLAYER_TESTNET_CHAIN_ID) throw new Error("Wallet and public client must be on X Layer Testnet.");
@@ -22,5 +29,6 @@ export async function updateVaultConstitution(params: { publicClient: PublicClie
   if (receipt.status !== "success") throw new Error("Constitution transaction failed onchain.");
   let constitution;
   try { constitution = await readVaultConstitution(publicClient, vaultAddress); } catch (error) { throw new Error(`Transaction confirmed, but the onchain constitution reread failed: ${error instanceof Error ? error.message : "unknown error"}`); }
+  if (constitution.vaultAddress !== getAddress(vaultAddress) || constitution.owner !== before.owner || !policiesEqual(constitution.constitution, validation.value)) throw new Error("Transaction confirmed, but the onchain constitution does not match the requested policy.");
   return { transactionHash, receiptBlockNumber: receipt.blockNumber, constitution };
 }

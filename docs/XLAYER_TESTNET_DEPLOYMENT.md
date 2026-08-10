@@ -14,6 +14,10 @@ The vault was successfully seeded with multiplier `2`: 8 USD₮0, 0.06 sTRSY, 0.
 
 The browser application is configured for the confirmed X Layer Testnet AssetRegistry, AdaptiveVaultFactory, official test USD₮0, and three sandbox-token addresses through the documented public environment variables. Adaptara Vault discovery remains owner-driven through `AdaptiveVaultFactory.vaultOf(owner)`; the demo vault is not a product fallback. Live reads use ERC-20 `balanceOf` and `decimals` against the discovered vault, retain demo/non-live reference-price disclosures, and interpret the current all-zero Financial Constitution as not activated. Policy writes are deliberately disabled in the Phase 12C1 application path until Phase 12C2. This wiring adds no transaction, signing, Builder Code, executor, or autonomous authority; Builder Code is not integrated or registered.
 
+## Phase 12C2A Constitution activation readiness
+
+The exact candidate policy—2,000 BPS reserve minimum, 6,000 BPS single-asset maximum, 3,000 BPS aggressive maximum, and 1,000 BPS daily reallocation limit—has been validated, found feasible, checked as compliant with the seeded 40/30/20/10 demo allocation, ABI-encoded and decoded, and successfully simulated read-only against the deployed vault. No signature or transaction was requested, the live UI remains write-disabled, the onchain policy remains zero/uninitialized, and Builder Code attribution remains outside this step.
+
 ## A. Prerequisites
 
 - Baseline: commit `c32ec6521e90509849ea61883bbde120ac114bf8`, branch `phase-12-xlayer-deployment-submission`.
