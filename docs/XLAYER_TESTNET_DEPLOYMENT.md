@@ -46,6 +46,10 @@ The demo owner successfully registered Adaptara's X Layer Testnet Builder Code w
 
 The confirmed `CodeRegistered` event and independent state reads establish the authoritative registered code as `tl5ce7n7gk5a5pzk`, with token ID `154752298414394082485795608522094836331`. The receipt also contains the matching ERC-721 `Transfer` mint from the zero address to the demo owner and `PayoutAddressUpdated` to the demo owner. `ownerOf(tokenId)` and `payoutAddress(tokenId)` equal the demo owner, `isRegistered(code)` is true, and the owner's Builder NFT balance is `1`. The earlier `1u79g4xb7ocejnca` value was simulation-only and is not the registered code. The vault remains unpaused with zero agent executor and Financial Constitution 2,000/6,000/3,000/1,000 BPS. `NEXT_PUBLIC_ADAPTARA_BUILDER_CODE` remains unconfigured, and no attributed transaction has yet been sent; application activation is reserved for Phase 12C4C.
 
+## Phase 12C4C2 browser attribution inspection record
+
+The authoritative code `tl5ce7n7gk5a5pzk` was configured locally, and the actual `FinancialConstitutionPanel` → `updateVaultConstitution` → `walletClient.writeContract` path produced a MetaMask request on X Layer Testnet for nonce `20`, target demo vault `0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4`, and temporary inspection-only policy 2,000/6,000/3,000/900 BPS. The wallet data contained selector `0x3c5ea516`, the expected base ABI values, and exact real ERC-8021 suffix `0x746c356365376e37676b356135707a6b100080218021802180218021802180218021`. The user cancelled the wallet request, no signature or broadcast occurred, and the draft was restored to the active 2,000/6,000/3,000/1,000 BPS policy; independent read-only verification confirmed nonce `20` and the unchanged policy. This proves the live application constructs the expected attributed wallet request, but it does not yet prove attribution in a mined transaction.
+
 ## A. Prerequisites
 
 - Baseline: commit `c32ec6521e90509849ea61883bbde120ac114bf8`, branch `phase-12-xlayer-deployment-submission`.
