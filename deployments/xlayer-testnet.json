@@ -11,7 +11,7 @@
     "sXAU": "0x836B4866d5BA31F4B2f6d05e65C26b8960A1604A",
     "sAAPLx": "0x009e2dfEa3FE134BcE3F769aA3E6C287823af184"
   },
-  "demoVault": null,
+  "demoVault": "0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4",
   "builderCode": null,
   "transactionHashes": {
     "deployment": [
@@ -25,14 +25,16 @@
       "0xbb750acf15574e495843273d1fd2bd07c96610a4146a620a60a650b3719ac43c",
       "0x28e77cfeec9f1e1192d1eb024a91df73842c2b234edcdfb96338da2aa4fea499"
     ],
-    "configuration": [],
+    "configuration": [
+      "0x6405dbbf131d7bfad89c2c5257cf5c2e94733fa81b2a5f55f9dc886e9b216dd4"
+    ],
     "seeding": [],
     "builderCodeRegistration": null
   },
   "verificationStatus": {
     "assetRegistry": "deployed-unverified",
     "vaultFactory": "deployed-unverified",
-    "adaptiveVault": "not-deployed",
+    "adaptiveVault": "deployed-unverified",
     "sandboxAssetToken": "deployed-unverified"
   }
 }
