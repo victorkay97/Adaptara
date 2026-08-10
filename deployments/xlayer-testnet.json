@@ -12,7 +12,7 @@
     "sAAPLx": "0x009e2dfEa3FE134BcE3F769aA3E6C287823af184"
   },
   "demoVault": "0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4",
-  "builderCode": null,
+  "builderCode": "tl5ce7n7gk5a5pzk",
   "transactionHashes": {
     "deployment": [
       "0xb70bd2c5d0688d385c5da405fce4546385f9d0524ef5f81c01b668a41d862ce8",
@@ -41,7 +41,7 @@
     "constitutionActivation": [
       "0x92d8a51ae653027dccf22ef4b7d361996163c031a23d442290f8548f8d1a640b"
     ],
-    "builderCodeRegistration": null
+    "builderCodeRegistration": "0x62d2c221dc73a44502e78529d5add9ad4cca51329377beab6064d51d041b61ef"
   },
   "verificationStatus": {
     "assetRegistry": "deployed-unverified",
