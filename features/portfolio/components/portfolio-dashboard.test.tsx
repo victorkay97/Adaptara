@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest";
 import { createAssetCatalog } from "../catalog";
 import type { PortfolioSnapshot } from "../types";
 import { YieldPanel } from "@/features/yield/components/yield-panel";
-import { shouldShowYieldIntelligence, VaultUnavailablePanel } from "./portfolio-dashboard";
+import { LIVE_CONSTITUTION_WRITES_ENABLED, shouldShowYieldIntelligence, VaultUnavailablePanel } from "./portfolio-dashboard";
 
 const vaultSnapshot = (): PortfolioSnapshot => ({
   source: "vault",
@@ -19,6 +19,7 @@ const vaultSnapshot = (): PortfolioSnapshot => ({
 });
 
 describe("vault yield discoverability", () => {
+  it("opts the live dashboard into the reviewed owner Constitution capability", () => expect(LIVE_CONSTITUTION_WRITES_ENABLED).toBe(true));
   it("does not place Yield Intelligence in the wallet flow", () => expect(shouldShowYieldIntelligence("wallet")).toBe(false));
   it("renders unavailable Yield Intelligence when vault integration is not configured", () => { const html = renderToStaticMarkup(<VaultUnavailablePanel message="Vault integration not deployed yet." />); expect(html).toContain("Vault integration not deployed yet."); expect(html).toContain("Yield Intelligence"); expect(html).toContain("disabled"); });
   it("renders unavailable Yield Intelligence when no vault has been created", () => { const html = renderToStaticMarkup(<VaultUnavailablePanel message="No Adaptara Vault found." />); expect(html).toContain("No Adaptara Vault found."); expect(html).toContain("Sandbox yield model · non-live"); expect(html).toContain("eligible sTRSY balance is required"); });

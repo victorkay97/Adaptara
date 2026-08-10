@@ -18,6 +18,10 @@ The browser application is configured for the confirmed X Layer Testnet AssetReg
 
 The exact candidate policy—2,000 BPS reserve minimum, 6,000 BPS single-asset maximum, 3,000 BPS aggressive maximum, and 1,000 BPS daily reallocation limit—has been validated, found feasible, checked as compliant with the seeded 40/30/20/10 demo allocation, ABI-encoded and decoded, and successfully simulated read-only against the deployed vault. No signature or transaction was requested, the live UI remains write-disabled, the onchain policy remains zero/uninitialized, and Builder Code attribution remains outside this step.
 
+## Phase 12C2B owner write UI capability
+
+The live dashboard now opts into the reviewed owner-only Constitution write capability for the upcoming explicit human-controlled activation. The panel remains default-deny and submission still requires the connected vault owner, X Layer Testnet, a wallet client, a loaded policy, and a valid, feasible, dirty draft. No signature or `setPolicy` transaction has occurred, the onchain policy remains zero/uninitialized, and Builder Code remains unintegrated and unregistered.
+
 ## A. Prerequisites
 
 - Baseline: commit `c32ec6521e90509849ea61883bbde120ac114bf8`, branch `phase-12-xlayer-deployment-submission`.

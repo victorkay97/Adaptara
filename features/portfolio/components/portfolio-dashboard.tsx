@@ -29,6 +29,7 @@ import { YieldPanel } from "@/features/yield/components/yield-panel";
 import { canReadVaultPortfolio, deriveVaultNavigation, deriveWorkspaceReadiness, hasUsableVaultSnapshot, ReadinessSummary, SourceSwitcher, WorkspaceAuthorityGate, WorkspaceNavigation, WorkspacePanel, WorkspaceSourceContent, type PortfolioSource } from "@/features/dashboard/components/workspace-controls";
 
 const demoPrices = new DemoReferencePriceProvider();
+export const LIVE_CONSTITUTION_WRITES_ENABLED = true;
 const displayNumber = (value: string) => { const [whole, fraction] = value.split("."); return `${BigInt(whole).toLocaleString()}${fraction ? `.${fraction.slice(0, 4)}` : ""}`; };
 const displayUsd = (value: bigint, decimals: number) => `$${displayNumber(formatUnitsExact(value, decimals))}`;
 
@@ -135,7 +136,7 @@ export function PortfolioDashboard() {
   return <div className="workspace-shell">
     <div className="workspace-intro"><div><p className="eyebrow">Portfolio workspace</p><h2>One source. Clear intelligence.</h2><p>Choose a supported wallet for read-only intelligence, or an Adaptara Vault for policy-bounded strategy simulations.</p></div><SourceSwitcher value={source} onChange={setSource} /></div>
     <ReadinessSummary readiness={readiness} />
-    <WorkspacePanel source={source}><WorkspaceAuthorityGate isConnected={connected} onXLayer={Boolean(onXLayer)} disconnected={<EmptyState title="Connect your wallet" detail="Connect an existing wallet to inspect supported holdings and begin the explicit intelligence journey." />} wrongNetwork={<EmptyState title="Wrong network" detail="Switch to X Layer Testnet to read supported wallet or vault balances." warning />} authorized={<WorkspaceSourceContent source={source} wallet={<div id="overview">{walletContent}</div>} vault={<><WorkspaceNavigation targets={vaultNavigation} /><div id="overview">{vaultContent}</div>{client && vault.data ? <div id="policy" className="mt-6"><FinancialConstitutionPanel key={`${address}:${vault.data.status === "available" ? vault.data.address : "no-vault"}`} address={address!} client={client} vault={vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : undefined} onActiveChange={handleActiveConstitution} writesEnabled={false} /></div> : null}</>} />}/></WorkspacePanel>
+    <WorkspacePanel source={source}><WorkspaceAuthorityGate isConnected={connected} onXLayer={Boolean(onXLayer)} disconnected={<EmptyState title="Connect your wallet" detail="Connect an existing wallet to inspect supported holdings and begin the explicit intelligence journey." />} wrongNetwork={<EmptyState title="Wrong network" detail="Switch to X Layer Testnet to read supported wallet or vault balances." warning />} authorized={<WorkspaceSourceContent source={source} wallet={<div id="overview">{walletContent}</div>} vault={<><WorkspaceNavigation targets={vaultNavigation} /><div id="overview">{vaultContent}</div>{client && vault.data ? <div id="policy" className="mt-6"><FinancialConstitutionPanel key={`${address}:${vault.data.status === "available" ? vault.data.address : "no-vault"}`} address={address!} client={client} vault={vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : undefined} onActiveChange={handleActiveConstitution} writesEnabled={LIVE_CONSTITUTION_WRITES_ENABLED} /></div> : null}</>} />}/></WorkspacePanel>
   </div>;
 
 }
