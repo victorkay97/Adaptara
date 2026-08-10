@@ -22,6 +22,12 @@ The exact candidate policy—2,000 BPS reserve minimum, 6,000 BPS single-asset m
 
 The live dashboard now opts into the reviewed owner-only Constitution write capability for the upcoming explicit human-controlled activation. The panel remains default-deny and submission still requires the connected vault owner, X Layer Testnet, a wallet client, a loaded policy, and a valid, feasible, dirty draft. No signature or `setPolicy` transaction has occurred, the onchain policy remains zero/uninitialized, and Builder Code remains unintegrated and unregistered.
 
+## Phase 12C2 Financial Constitution activation record
+
+The demo owner successfully activated the Financial Constitution with transaction `0x92d8a51ae653027dccf22ef4b7d361996163c031a23d442290f8548f8d1a640b` in block `37935569`. The successful zero-value transaction used sender nonce `18`; the post-activation owner nonce is `19`. It set the exact policy to 2,000 BPS minimum reserve, 6,000 BPS maximum single-asset exposure, 3,000 BPS maximum baseline-Aggressive exposure, and 1,000 BPS maximum daily reallocation. The application confirmed the receipt and reread the active policy, and an independent read-only RPC reconciliation confirmed the transaction, `PolicyUpdated` event, and current onchain values.
+
+The seeded 40/30/20/10 demo portfolio remains compliant: reserve is 4,000 BPS against a 2,000 BPS minimum, the largest position is 4,000 BPS against a 6,000 BPS maximum, and baseline-Aggressive exposure is 1,000 BPS against a 3,000 BPS maximum. The vault remains unpaused, its guardian remains the demo owner, and its agent executor remains zero. This policy-only operation moved no token balance. Its calldata ended after the fourth ABI word, with no ERC-8021 or Builder Code attribution; Builder Code remains unintegrated and unregistered.
+
 ## A. Prerequisites
 
 - Baseline: commit `c32ec6521e90509849ea61883bbde120ac114bf8`, branch `phase-12-xlayer-deployment-submission`.

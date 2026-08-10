@@ -38,6 +38,9 @@
       "0x3823484fc4f9921ab7ba022bf4bb27a90032908b5e86a992129402923a520c99",
       "0xa641d765bfc4a05e956e462523425116a02287115cf5759c81c0e24d99c70de3"
     ],
+    "constitutionActivation": [
+      "0x92d8a51ae653027dccf22ef4b7d361996163c031a23d442290f8548f8d1a640b"
+    ],
     "builderCodeRegistration": null
   },
   "verificationStatus": {
