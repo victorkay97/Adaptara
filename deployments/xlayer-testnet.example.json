@@ -1,0 +1,14 @@
+{
+  "network": "xlayer-testnet",
+  "chainId": 1952,
+  "deploymentTimestamp": null,
+  "gitCommit": null,
+  "deployer": null,
+  "assetRegistry": null,
+  "vaultFactory": null,
+  "sandboxTokens": { "sTRSY": null, "sXAU": null, "sAAPLx": null },
+  "demoVault": null,
+  "builderCode": null,
+  "transactionHashes": { "deployment": [], "configuration": [], "seeding": [], "builderCodeRegistration": null },
+  "verificationStatus": { "assetRegistry": "not-deployed", "vaultFactory": "not-deployed", "adaptiveVault": "not-deployed", "sandboxAssetToken": "not-deployed" }
+}

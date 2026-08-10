@@ -12,7 +12,7 @@ Each `AssetPosition` keeps raw `bigint` balance, verified token decimals, a sepa
 
 ## Prices and valuation
 
-Reference prices use eight decimals (`PRICE_DECIMALS = 8`) and integer math. Phase 3's provider is explicitly `DemoReferencePriceProvider`; USD₮0 may be represented as one demo USD, without claiming a verified peg. External market and Chainlink integrations are later work.
+Reference prices use eight decimals (`PRICE_DECIMALS = 8`) and integer math. Phase 3's provider is explicitly `DemoReferencePriceProvider`; its transparent demo references are USD₮0 $1, sTRSY $100, sXAU $2,000, and sAAPLx $200. These are sandbox valuation inputs, not market data, backing, ownership claims, or a verified peg. External market and Chainlink integrations are later work.
 
 `valued` means every configured readable balance is known and every known nonzero holding is priced. `partial` means a meaningful valued subtotal exists, but at least one configured balance is unknown or one known nonzero holding is unpriced. `unavailable` means no meaningful USD value can be presented, including when configured balances are unknown and no other exposure can be valued. Zero-balance unpriced assets do not make a complete valuation partial, and `not-configured` assets do not affect live completeness.
 

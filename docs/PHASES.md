@@ -10,11 +10,11 @@
 8. **Phase 8 — Sentinel / Event Monitoring (complete)**
 9. **Phase 9 — Yield & Compounding (complete)**
 10. **Phase 10 — Full Product UX & Demo Experience (complete)**
-11. **Phase 11 — Security & Adversarial Testing (current)**
-12. Phase 12 — X Layer Deployment & Submission
+11. **Phase 11 — Security & Adversarial Testing (complete)**
+12. **Phase 12 — X Layer Deployment & Submission (current — deployment preparation)**
 13. Phase 13 — Demo Rehearsal
 
-Only Phase 11 is currently in scope. Phase 12 is not implemented.
+Phases 1–11 are complete. Phase 12A deployment preparation is currently in scope; no testnet deployment has occurred.
 
 # Current phase status
 
@@ -28,4 +28,5 @@ Only Phase 11 is currently in scope. Phase 12 is not implemented.
 - Phase 8 — Complete
 - Phase 9 — Complete
 - Phase 10 — Complete
-- Phase 11 — Current
+- Phase 11 — Complete
+- Phase 12 — Current — deployment preparation

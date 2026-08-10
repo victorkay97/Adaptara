@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
+    "preflight:xlayer": "node scripts/preflight-xlayer.mjs",
     "test:contracts": "forge test --root contracts",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build && npm run test:contracts"
   },
