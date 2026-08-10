@@ -8,6 +8,7 @@ import {AssetRegistry} from "../src/AssetRegistry.sol";
 import {AdaptiveVault} from "../src/AdaptiveVault.sol";
 import {IAssetRegistry} from "../src/interfaces/IAssetRegistry.sol";
 import {MockERC20} from "./mocks/MockERC20.sol";
+import {FalseReturnERC20, RevertingERC20, NoReturnERC20, RejectingNativeRecipient} from "./mocks/AdversarialERC20.sol";
 
 contract AdaptiveVaultTest is Test {
     AssetRegistry internal registry;
@@ -74,6 +75,60 @@ contract AdaptiveVaultTest is Test {
         vm.assume(amount > 0);
         _deposit(amount);
         assertEq(supported.balanceOf(address(vault)), amount);
+    }
+
+    function testHostileTokenFailuresNeverReportSuccessfulMovement() public {
+        FalseReturnERC20 falseToken = new FalseReturnERC20();
+        RevertingERC20 revertingToken = new RevertingERC20();
+        registry.registerAsset(address(falseToken), IAssetRegistry.RiskTier.Defensive);
+        registry.registerAsset(address(revertingToken), IAssetRegistry.RiskTier.Defensive);
+
+        falseToken.mint(user, 10);
+        vm.expectRevert();
+        vm.prank(user);
+        vault.deposit(address(falseToken), 1);
+        assertEq(falseToken.balanceOf(address(vault)), 0);
+
+        revertingToken.mint(user, 10);
+        vm.expectRevert(bytes("hostile transferFrom"));
+        vm.prank(user);
+        vault.deposit(address(revertingToken), 1);
+        assertEq(revertingToken.balanceOf(address(vault)), 0);
+    }
+
+    function testSafeERC20AcceptsStandardsCompatibleNoReturnToken() public {
+        NoReturnERC20 token = new NoReturnERC20();
+        registry.registerAsset(address(token), IAssetRegistry.RiskTier.Defensive);
+        token.mint(user, 10);
+        vm.prank(user);
+        token.approve(address(vault), 10);
+        vm.prank(user);
+        vault.deposit(address(token), 10);
+        assertEq(token.balanceOf(address(vault)), 10);
+        vm.prank(owner);
+        vault.withdraw(address(token), recipient, 4);
+        assertEq(token.balanceOf(recipient), 4);
+    }
+
+    function testHostileOutgoingTokenTransfersFailClosed() public {
+        FalseReturnERC20 falseToken = new FalseReturnERC20();
+        RevertingERC20 revertingToken = new RevertingERC20();
+        registry.registerAsset(address(falseToken), IAssetRegistry.RiskTier.Defensive);
+        registry.registerAsset(address(revertingToken), IAssetRegistry.RiskTier.Defensive);
+        falseToken.mint(address(vault), 10);
+        revertingToken.mint(address(vault), 10);
+
+        vm.expectRevert();
+        vm.prank(owner);
+        vault.withdraw(address(falseToken), recipient, 1);
+        assertEq(falseToken.balanceOf(address(vault)), 10);
+        assertEq(falseToken.balanceOf(recipient), 0);
+
+        vm.expectRevert(bytes("hostile transfer"));
+        vm.prank(owner);
+        vault.withdraw(address(revertingToken), recipient, 1);
+        assertEq(revertingToken.balanceOf(address(vault)), 10);
+        assertEq(revertingToken.balanceOf(recipient), 0);
     }
 
     function testOwnerWithdrawsAndEmitsEvent() public {
@@ -313,6 +368,16 @@ contract AdaptiveVaultTest is Test {
         vault.recoverNativeCurrency(payable(recipient), 1 ether);
         assertEq(recipient.balance, recipientBefore + 1 ether);
         assertEq(address(vault).balance, 1 ether);
+    }
+
+    function testRejectedNativeRecoveryRevertsWithoutLoss() public {
+        RejectingNativeRecipient rejectingRecipient = new RejectingNativeRecipient();
+        vm.deal(address(vault), 2 ether);
+        vm.expectRevert(bytes("native rejected"));
+        vm.prank(owner);
+        vault.recoverNativeCurrency(payable(address(rejectingRecipient)), 1 ether);
+        assertEq(address(vault).balance, 2 ether);
+        assertEq(address(rejectingRecipient).balance, 0);
     }
 
     function testNonOwnerRolesCannotRecoverNativeCurrency() public {

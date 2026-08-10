@@ -23,12 +23,27 @@ export const planningEligible = (snapshot: PortfolioSnapshot): AssetPosition[] =
 
 function validateSnapshot(snapshot: PortfolioSnapshot): string[] {
   const errors: string[] = [];
+  if (snapshot.blockConsistency !== "single-block") errors.push("The portfolio must preserve single-block onchain consistency.");
+  try { getAddress(snapshot.accountAddress); } catch { errors.push("The portfolio account address is invalid."); }
   const ids = snapshot.positions.map((position) => position.asset.id);
   if (new Set(ids).size !== ids.length) errors.push("The portfolio contains duplicate asset IDs.");
+  if (ids.length !== ASSET_IDS.length || ASSET_IDS.some((id) => !ids.includes(id))) errors.push("The portfolio must contain every canonical Adaptara asset exactly once.");
   for (const position of snapshot.positions) {
     const canonical = catalogById.get(position.asset.id);
     if (!canonical || !ASSET_IDS.includes(position.asset.id)) errors.push("The portfolio contains a non-canonical asset ID.");
-    else if (position.asset.baselineRiskTier !== canonical.baselineRiskTier || position.asset.expectedDecimals !== canonical.expectedDecimals) errors.push(`Asset ${position.asset.id} does not match canonical policy metadata.`);
+    else if (
+      position.asset.symbol !== canonical.symbol
+      || position.asset.displayName !== canonical.displayName
+      || position.asset.role !== canonical.role
+      || position.asset.baselineRiskTier !== canonical.baselineRiskTier
+      || position.asset.expectedDecimals !== canonical.expectedDecimals
+      || position.asset.sandbox !== canonical.sandbox
+      || position.asset.referencePriceId !== canonical.referencePriceId
+    ) errors.push(`Asset ${position.asset.id} does not match canonical policy metadata.`);
+    if (canonical) {
+      if (position.availability === "available" && (position.rawBalance === null || position.balanceDecimals !== canonical.expectedDecimals)) errors.push(`Available asset ${position.asset.id} must have a known balance with canonical decimals.`);
+      if ((position.availability === "read-error" || position.availability === "configuration-error") && position.rawBalance !== null) errors.push(`Unavailable asset ${position.asset.id} cannot present an unknown balance as known.`);
+    }
   }
   const meaningful = snapshot.positions.filter((position) => position.rawBalance !== null && position.rawBalance > 0n);
   if (!meaningful.length) errors.push("The vault portfolio has no meaningful nonzero holding.");
@@ -81,7 +96,9 @@ export function validateAdaptationInput(input: AdaptationInput): string[] {
   if (maraAnalysis.status !== "complete" || maraAnalysis.proposals.some((proposal) => proposal.executionAuthority !== "none" || !MARA_ACTIONS.includes(proposal.action))) blockers.push("An already-validated, complete MARA advisory analysis is required.");
   if (constitution.source !== "onchain") blockers.push("An active onchain Financial Constitution is required.");
   if (constitution.source === "onchain") {
-    if (getAddress(snapshot.accountAddress) !== getAddress(constitution.vaultAddress)) blockers.push("The portfolio snapshot does not belong to the constitution's vault.");
+    try {
+      if (getAddress(snapshot.accountAddress) !== getAddress(constitution.vaultAddress)) blockers.push("The portfolio snapshot does not belong to the constitution's vault.");
+    } catch { blockers.push("The portfolio or constitution vault address is invalid."); }
     const validation = validateConstitution(constitution.constitution);
     if (!validation.valid) blockers.push("The active Financial Constitution is structurally invalid.");
     else if (!evaluateConstitutionFeasibility(validation.value, ASSET_CATALOG).feasible) blockers.push("The active Financial Constitution is infeasible for the supported asset catalog.");

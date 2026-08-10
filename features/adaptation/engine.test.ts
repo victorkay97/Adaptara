@@ -8,7 +8,7 @@ import { getDemoRiskSignals } from "@/features/risk/signals";
 import type { MaraAction, MaraAnalysis } from "@/features/mara/types";
 import type { OnchainConstitution } from "@/features/constitution/types";
 import { createAdaptationPlan } from "./engine";
-import { validateAdaptationPlan } from "./validation";
+import { validateAdaptationInput, validateAdaptationPlan } from "./validation";
 import { evaluateTargetAllocationCompliance } from "./target-compliance";
 import type { AdaptationInput } from "./types";
 
@@ -70,6 +70,27 @@ describe("deterministic adaptation engine", () => {
   it("rejects a target policy violation even with forged recorded compliance", () => { const value = input(); const valid = createAdaptationPlan(value); const allocations = valid.allocations.map((a) => a.assetId === "usdt0" ? { ...a, targetAllocationBps: 6500, deltaBps: 3500 } : a.assetId === "strsy" ? { ...a, targetAllocationBps: 500, deltaBps: -3500 } : a); const forged = { ...valid, reallocationBps: 3500, allocations }; expect(validateAdaptationPlan(forged, value)).not.toEqual([]); });
 
   it("blocks forged canonical metadata and incoherent assessed risk", () => { const forgedSnapshot = snapshot(); forgedSnapshot.positions[1].asset = { ...forgedSnapshot.positions[1].asset, baselineRiskTier: "Aggressive" }; expect(createAdaptationPlan(input({ snapshot: forgedSnapshot, riskAssessment: risk(forgedSnapshot) })).status).toBe("blocked"); const snap = snapshot(); const assessed = risk(snap); assessed.assetAssessments[0].factors[0].weightBps = 1; expect(createAdaptationPlan(input({ snapshot: snap, riskAssessment: assessed })).status).toBe("blocked"); });
+
+  it.each([
+    ["symbol", { symbol: "FORGED" }],
+    ["display name", { displayName: "Forged display name" }],
+    ["role", { role: "forged-role" }],
+    ["baseline risk tier", { baselineRiskTier: "Aggressive" as const }],
+    ["expected decimals", { expectedDecimals: 6 }],
+    ["sandbox flag", { sandbox: false }],
+    ["reference price ID", { referencePriceId: "forged-price" }],
+  ])("blocks forged canonical %s metadata", (_label, forged) => { const snap = snapshot(); snap.positions[1].asset = { ...snap.positions[1].asset, ...forged }; expect(createAdaptationPlan(input({ snapshot: snap, riskAssessment: risk(snap) })).status).toBe("blocked"); });
+
+  it("blocks a mixed-block snapshot", () => { const snap = { ...snapshot(), blockConsistency: "latest-near-simultaneous" as const }; expect(createAdaptationPlan(input({ snapshot: snap, riskAssessment: risk(snap) })).status).toBe("blocked"); });
+
+  it("requires every canonical asset even when the omitted position is known zero", () => { const snap = snapshot([3000, 4000, 3000, 0]); snap.positions = snap.positions.slice(0, 3); const value = input({ snapshot: snap, riskAssessment: risk(snap) }); expect(validateAdaptationInput(value)).toContain("The portfolio must contain every canonical Adaptara asset exactly once."); expect(createAdaptationPlan(value).status).toBe("blocked"); });
+
+  it.each([
+    ["read-error disguised as zero", { availability: "read-error" as const, rawBalance: 0n }],
+    ["configuration-error disguised as zero", { availability: "configuration-error" as const, rawBalance: 0n }],
+    ["available unknown balance", { availability: "available" as const, rawBalance: null }],
+    ["available wrong decimals", { availability: "available" as const, balanceDecimals: 6 }],
+  ])("blocks incoherent availability state: %s", (_label, hostile) => { const snap = snapshot([3000, 4000, 3000, 0]); snap.positions[3] = { ...snap.positions[3], ...hostile }; const value = input({ snapshot: snap, riskAssessment: risk(snap) }); expect(validateAdaptationInput(value).some((error) => /known balance|unknown balance|canonical decimals/.test(error))).toBe(true); expect(createAdaptationPlan(value).status).toBe("blocked"); });
 
   it("rejects independently forged plan provenance fields", () => { const value = input(); const valid = createAdaptationPlan(value); expect(validateAdaptationPlan(valid, value)).toEqual([]); expect(validateAdaptationPlan({ ...valid, vaultAddress: owner }, value)).not.toEqual([]); expect(validateAdaptationPlan({ ...valid, chainId: 1 }, value)).not.toEqual([]); expect(validateAdaptationPlan({ ...valid, portfolioBlockNumber: 999n }, value)).not.toEqual([]); expect(validateAdaptationPlan({ ...valid, constitutionBlockNumber: 999n }, value)).not.toEqual([]); });
 

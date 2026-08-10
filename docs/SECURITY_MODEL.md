@@ -1,5 +1,9 @@
 # Security Model
 
+## Phase 11 adversarial hardening
+
+Phase 11 revalidated every existing authority boundary under hostile runtime objects, provider output, RPC failures, cached state, token behavior, and direct contract callers. It added no execution capability. Runtime consumers fail closed, simulations remain non-authoritative, and future execution must reread chain state. The complete findings and authority inventory are in `SECURITY_REVIEW.md`.
+
 ## Phase 10 UX boundary
 
 The UX restructuring does not change authority boundaries. Sentinel, MARA, Adaptation Simulation, and Yield Intelligence remain explicitly user-triggered, and source switching invokes none of them. Phase 10 introduces no signer, API, provider, or write surface. The previously reviewed owner-confirmed Financial Constitution update remains the only UI write behavior.
