@@ -1,9 +1,14 @@
-import { publicEnv } from "@/lib/env/public";
+import { Attribution } from "ox/erc8021";
+import type { Hex } from "viem";
 
-export interface BuilderAttribution { readonly code: string }
-export function getBuilderAttribution(): BuilderAttribution | undefined {
-  return publicEnv.NEXT_PUBLIC_BUILDER_CODE ? { code: publicEnv.NEXT_PUBLIC_BUILDER_CODE } : undefined;
+const BUILDER_CODE_PATTERN = /^[a-z0-9]{16}$/;
+
+export function createBuilderAttributionDataSuffix(builderCode: string): Hex {
+  const code = builderCode.trim();
+  if (!BUILDER_CODE_PATTERN.test(code)) throw new Error("Adaptara Builder Code must be a 16-character lowercase alphanumeric value.");
+  return Attribution.toDataSuffix({ codes: [code] });
 }
 
-// Do not alter transaction calldata until X Layer's official current viem
-// ERC-8021 integration is verified. See docs/CHAIN_CONFIGURATION.md.
+export function optionalBuilderAttributionDataSuffix(builderCode?: string): Hex | undefined {
+  return builderCode === undefined ? undefined : createBuilderAttributionDataSuffix(builderCode);
+}

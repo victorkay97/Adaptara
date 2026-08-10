@@ -6,4 +6,4 @@ No block explorer is configured because one has not been verified. Unit tests do
 
 ## Builder Code / ERC-8021
 
-`lib/contracts/builder-attribution.ts` provides a typed configuration boundary but deliberately does not modify transactions. Before transactions are implemented, verify X Layer's current official ERC-8021/viem mechanism and apply it once at the shared transaction boundary with encoding tests. `NEXT_PUBLIC_BUILDER_CODE` remains optional. No attribution API has been fabricated.
+`lib/contracts/builder-attribution.ts` validates the optional `NEXT_PUBLIC_ADAPTARA_BUILDER_CODE` and uses `Attribution.toDataSuffix` from the direct `ox/erc8021` dependency. The owner-only Constitution writer passes that typed suffix through Viem's per-transaction `dataSuffix` option on its existing single `writeContract` call. With no registered/configured code, the suffix is absent. Registration remains a separate explicit operation.

@@ -27,4 +27,10 @@ describe("public environment validation", () => {
     expect(parsePublicEnv(configured)).toMatchObject(configured);
     expect(() => parsePublicEnv({ ...configured, NEXT_PUBLIC_SXAU_ADDRESS: configured.NEXT_PUBLIC_STRSY_ADDRESS })).toThrow("distinct");
   });
+
+  it("keeps Builder attribution optional and rejects malformed configuration", () => {
+    expect(parsePublicEnv({}).NEXT_PUBLIC_ADAPTARA_BUILDER_CODE).toBeUndefined();
+    expect(parsePublicEnv({ NEXT_PUBLIC_ADAPTARA_BUILDER_CODE: "adaptra12c3test1" }).NEXT_PUBLIC_ADAPTARA_BUILDER_CODE).toBe("adaptra12c3test1");
+    for (const malformed of ["", "short", "ADAPTRA12C3TEST1", "adaptra-2c3test1", "adaptra12c3test12"]) expect(() => parsePublicEnv({ NEXT_PUBLIC_ADAPTARA_BUILDER_CODE: malformed })).toThrow("Builder Code");
+  });
 });

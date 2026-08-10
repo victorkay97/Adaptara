@@ -6,6 +6,8 @@ import { getAddress, type Address, type PublicClient } from "viem";
 import { useWalletClient } from "wagmi";
 import { ASSET_CATALOG } from "@/features/portfolio/catalog";
 import type { PortfolioSnapshot, VaultDiscovery } from "@/features/portfolio/types";
+import { optionalBuilderAttributionDataSuffix } from "@/lib/contracts/builder-attribution";
+import { publicEnv } from "@/lib/env/public";
 import { EMPTY_CONSTITUTION, isConstitutionActivated } from "../constants";
 import { evaluateConstitutionCompliance } from "../compliance";
 import { evaluateConstitutionFeasibility } from "../feasibility";
@@ -22,6 +24,7 @@ const fields: Array<[ConstitutionField, string, string]> = [
   ["maximumDailyReallocationBps", "Maximum daily reallocation", "Future action limit; not current portfolio compliance."],
 ];
 const inputStrings = (policy: FinancialConstitution) => Object.fromEntries(fields.map(([key]) => [key, formatBpsAsPercent(policy[key])])) as Record<ConstitutionField, string>;
+const builderAttributionDataSuffix = optionalBuilderAttributionDataSuffix(publicEnv.NEXT_PUBLIC_ADAPTARA_BUILDER_CODE);
 
 export function applyConfirmedConstitution(confirmed: OnchainConstitution): { active: OnchainConstitution; draft: FinancialConstitution; inputs: Record<ConstitutionField, string> } {
   return { active: confirmed, draft: confirmed.constitution, inputs: inputStrings(confirmed.constitution) };
@@ -83,7 +86,7 @@ export function FinancialConstitutionPanel({ address, client, vault, snapshot, o
     const startedQueryKey = queryKey;
     setSaving(true); setTx("Awaiting wallet confirmation…");
     try {
-      const result = await executeConstitutionWriteIfEnabled(writesEnabled, () => updateVaultConstitution({ publicClient: client, walletClient, vaultAddress, connectedAddress: address, policy: draft, assets: ASSET_CATALOG }));
+      const result = await executeConstitutionWriteIfEnabled(writesEnabled, () => updateVaultConstitution({ publicClient: client, walletClient, vaultAddress, connectedAddress: address, policy: draft, assets: ASSET_CATALOG, dataSuffix: builderAttributionDataSuffix }));
       if (!result) return;
       const confirmed = commitConfirmedConstitution(queryClient, startedQueryKey, result.constitution, startedContext, contextRef.current);
       if (confirmed) { setDraft(confirmed.draft); setInputs(confirmed.inputs); setErrors({}); setTx("Constitution confirmed onchain."); }

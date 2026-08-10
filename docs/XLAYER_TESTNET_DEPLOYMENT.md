@@ -28,6 +28,12 @@ The demo owner successfully activated the Financial Constitution with transactio
 
 The seeded 40/30/20/10 demo portfolio remains compliant: reserve is 4,000 BPS against a 2,000 BPS minimum, the largest position is 4,000 BPS against a 6,000 BPS maximum, and baseline-Aggressive exposure is 1,000 BPS against a 3,000 BPS maximum. The vault remains unpaused, its guardian remains the demo owner, and its agent executor remains zero. This policy-only operation moved no token balance. Its calldata ended after the fourth ABI word, with no ERC-8021 or Builder Code attribution; Builder Code remains unintegrated and unregistered.
 
+## Phase 12C3 ERC-8021 client integration
+
+ERC-8021 attribution client support is implemented using direct `ox/erc8021` and a per-transaction Viem `dataSuffix` on the existing owner-only `setPolicy` write. The isolated helper validates one optional public Adaptara Builder Code and generates the suffix with `Attribution.toDataSuffix`; no wallet, signing, financial-contract, MARA, or Sentinel authority was added. Deterministic tests and a read-only test-fixture simulation confirmed that the 132-byte `setPolicy` calldata remains unchanged before the trailing suffix and that one writer call remains one transaction.
+
+No Builder Code has been registered or configured, no attributed transaction has been sent, and the manifest's Builder Code fields remain null. The active Constitution remains 2,000/6,000/3,000/1,000 BPS and the owner nonce remains `19`. Registration via testnet `registerAuto` is reserved for Phase 12C4.
+
 ## A. Prerequisites
 
 - Baseline: commit `c32ec6521e90509849ea61883bbde120ac114bf8`, branch `phase-12-xlayer-deployment-submission`.
@@ -90,7 +96,7 @@ Compiler metadata: Solidity `0.8.28`, optimizer enabled, 200 runs, no explicit E
 
 The [official X Layer integration guide](https://web3.okx.com/onchainos/dev-docs/xlayer/developer/builder-codes/integration) requires Viem 2.45.0 or newer and identifies the X Layer Testnet Builder Code contract as `0x33907e98d7392d95212b05ab03f091e02d7815bf`; testnet registration calls `registerAuto`. Keep this address in deployment/integration configuration only. Register manually and explicitly after deployment stability; never place it in `AdaptiveVault`, `AssetRegistry`, or another financial-domain contract. **NOT EXECUTED — PHASE 12A**.
 
-Resolved dependencies: direct Viem `2.55.11`, Wagmi `2.19.5`; `ox` is not direct but is transitively present (`0.14.33`, `0.9.17`, `0.6.9`, `0.6.7`). No Viem upgrade is required. Phase 12C should review adding direct `ox`, lockfile/audit impact, Wagmi client typing, wallet connector behavior, and all transaction tests before change.
+Resolved dependencies: direct Viem resolves to `2.55.11`, Wagmi resolves to `2.19.5`, and direct ox resolves to `0.14.33`; older ox copies remain transitive where required by connector dependencies. No Viem or Wagmi upgrade was required for the Phase 12C3 integration.
 
 Attribution belongs only on the wallet-backed client sending X Layer transactions (currently the owner-only `setPolicy` write), using `ox/erc8021` `Attribution.toDataSuffix`. It never belongs in Solidity and never creates a second transaction. Future tests must prove suffix enabled/disabled behavior, unchanged ABI semantics, wrong-chain exclusion, one-transaction behavior, and that MARA/Sentinel remain unable to transact. **NOT EXECUTED — PHASE 12A**.
 
