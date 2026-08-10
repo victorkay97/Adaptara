@@ -1,0 +1,38 @@
+{
+  "network": "xlayer-testnet",
+  "chainId": 1952,
+  "deploymentTimestamp": "2026-08-10T15:47:43Z",
+  "gitCommit": "61a67f126f27a61f86fc54fd7dd0c43e1eb1e60a",
+  "deployer": "0x7bc8489c39A750CCFa6C06d5d6dB5F682976234E",
+  "assetRegistry": "0xd211E4d1e1049d800d5360A078d52B0fcDD74684",
+  "vaultFactory": "0xBE65de08FFbF819B124cbD2C8C88C21bAcdA8c2e",
+  "sandboxTokens": {
+    "sTRSY": "0x4BC1974cdf868702bcC2B6B7D9F8aF54A7A156Dc",
+    "sXAU": "0x836B4866d5BA31F4B2f6d05e65C26b8960A1604A",
+    "sAAPLx": "0x009e2dfEa3FE134BcE3F769aA3E6C287823af184"
+  },
+  "demoVault": null,
+  "builderCode": null,
+  "transactionHashes": {
+    "deployment": [
+      "0xb70bd2c5d0688d385c5da405fce4546385f9d0524ef5f81c01b668a41d862ce8",
+      "0x80c51c095d0762ea981cef028c7b2c37766393b04bf2998ddfa897d4fdc4f187",
+      "0x85e6d8e1ee030e2bfa4e15f2af055444f8f15c222c5fa8f156075bc75edfd7d8",
+      "0x9db886bae2772285a5b914f7cbfa9cede703c7ff3781c2c14ba8885ee4367462",
+      "0xf1e9f7b9a3bd0e4c45480acae33afed3481fa6af18cbe9935e634c65518bc35a",
+      "0xe4085ea236b2006ba192f117125434541ee559324aa2e85bd249e9e877b8472d",
+      "0xaf490babdf84028e86833fffd0e73e9082ebb458902c5abd54ded1bc086b08f0",
+      "0xbb750acf15574e495843273d1fd2bd07c96610a4146a620a60a650b3719ac43c",
+      "0x28e77cfeec9f1e1192d1eb024a91df73842c2b234edcdfb96338da2aa4fea499"
+    ],
+    "configuration": [],
+    "seeding": [],
+    "builderCodeRegistration": null
+  },
+  "verificationStatus": {
+    "assetRegistry": "deployed-unverified",
+    "vaultFactory": "deployed-unverified",
+    "adaptiveVault": "not-deployed",
+    "sandboxAssetToken": "deployed-unverified"
+  }
+}

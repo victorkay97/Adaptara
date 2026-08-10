@@ -1,6 +1,12 @@
 # X Layer Testnet Deployment Plan
 
-Phase 12A prepares a reproducible deployment only. Every broadcast, deployment, registration, vault creation, deposit, verification request, and frontend address change below is **NOT EXECUTED — PHASE 12A**.
+Phase 12A prepared this reproducible deployment plan without broadcasting. Its **NOT EXECUTED — PHASE 12A** markers preserve the state at preparation time; the Phase 12B record below is the current source of deployment facts.
+
+## Phase 12B deployment record
+
+The base contracts were successfully deployed on X Layer Testnet, chain ID `1952`, at `2026-08-10T15:47:43Z` by `0x7bc8489c39A750CCFa6C06d5d6dB5F682976234E`. Confirmed addresses are AssetRegistry `0xd211E4d1e1049d800d5360A078d52B0fcDD74684`, AdaptiveVaultFactory `0xBE65de08FFbF819B124cbD2C8C88C21bAcdA8c2e`, sTRSY `0x4BC1974cdf868702bcC2B6B7D9F8aF54A7A156Dc`, sXAU `0x836B4866d5BA31F4B2f6d05e65C26b8960A1604A`, and sAAPLx `0x009e2dfEa3FE134BcE3F769aA3E6C287823af184`. The public transaction record is in `deployments/xlayer-testnet.json`.
+
+Explorer verification is pending. No demo vault exists yet; no policy was set, no portfolio was seeded, and no Builder Code was registered. All later planned steps below remain unexecuted.
 
 ## A. Prerequisites
 
