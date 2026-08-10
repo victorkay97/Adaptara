@@ -6,6 +6,7 @@ import { getAddress } from "viem";
 import { useAccount, usePublicClient } from "wagmi";
 import { xLayerTestnet } from "@/lib/chain/xlayer";
 import { publicEnv } from "@/lib/env/public";
+import { shortenAddress } from "@/lib/wallet/format";
 import { ASSET_CATALOG } from "../catalog";
 import { formatUnitsExact } from "../money";
 import { DemoReferencePriceProvider } from "../prices";
@@ -84,7 +85,7 @@ function SnapshotPanel({ title, snapshot, constitution }: { title: string; snaps
   const reserve = snapshot.positions.find((p) => p.asset.baselineRiskTier === "Reserve")?.allocationBps;
   const totalLabel = snapshot.valuationStatus === "partial" ? "Valued reference subtotal" : "Total reference value";
   return <section aria-labelledby={`${snapshot.source}-title`} className="rounded-3xl border border-white/80 bg-[var(--surface)] p-5 shadow-[0_20px_60px_rgba(34,57,43,0.08)] sm:p-7">
-    <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#377657]">Adaptara-supported portfolio</p><h2 id={`${snapshot.source}-title`} className="mt-2 text-2xl font-semibold">{title}</h2></div><span className="text-xs text-[var(--muted)]">Single-block read · {snapshot.valuationStatus} valuation</span></div>
+    <div className="flex flex-wrap items-end justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#377657]">Adaptara-supported portfolio</p><h2 id={`${snapshot.source}-title`} className="mt-2 text-2xl font-semibold">{title}</h2><p className="mt-1 text-xs text-[var(--muted)]" title={snapshot.accountAddress}>{snapshot.source === "vault" ? "Discovered vault" : "Connected wallet"}: {shortenAddress(snapshot.accountAddress, 6)}</p></div><span className="text-xs text-[var(--muted)]">Single-block read · {snapshot.valuationStatus} valuation</span></div>
     <div className="mt-6 grid gap-3 rounded-2xl bg-[#edf3ed] p-4 sm:grid-cols-4">
       <div><p className="text-xs text-[var(--muted)]">{totalLabel}</p><p className="mt-1 font-semibold">{snapshot.totals.totalUsdValue > 0n ? displayUsd(snapshot.totals.totalUsdValue, snapshot.totals.usdValueDecimals) : "—"}</p></div>
       <div><p className="text-xs text-[var(--muted)]">Asset count</p><p className="mt-1 font-semibold">{snapshot.totals.nonzeroAssetCount}</p></div>
@@ -134,7 +135,7 @@ export function PortfolioDashboard() {
   return <div className="workspace-shell">
     <div className="workspace-intro"><div><p className="eyebrow">Portfolio workspace</p><h2>One source. Clear intelligence.</h2><p>Choose a supported wallet for read-only intelligence, or an Adaptara Vault for policy-bounded strategy simulations.</p></div><SourceSwitcher value={source} onChange={setSource} /></div>
     <ReadinessSummary readiness={readiness} />
-    <WorkspacePanel source={source}><WorkspaceAuthorityGate isConnected={connected} onXLayer={Boolean(onXLayer)} disconnected={<EmptyState title="Connect your wallet" detail="Connect an existing wallet to inspect supported holdings and begin the explicit intelligence journey." />} wrongNetwork={<EmptyState title="Wrong network" detail="Switch to X Layer Testnet to read supported wallet or vault balances." warning />} authorized={<WorkspaceSourceContent source={source} wallet={<div id="overview">{walletContent}</div>} vault={<><WorkspaceNavigation targets={vaultNavigation} /><div id="overview">{vaultContent}</div>{client && vault.data ? <div id="policy" className="mt-6"><FinancialConstitutionPanel key={`${address}:${vault.data.status === "available" ? vault.data.address : "no-vault"}`} address={address!} client={client} vault={vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : undefined} onActiveChange={handleActiveConstitution} /></div> : null}</>} />}/></WorkspacePanel>
+    <WorkspacePanel source={source}><WorkspaceAuthorityGate isConnected={connected} onXLayer={Boolean(onXLayer)} disconnected={<EmptyState title="Connect your wallet" detail="Connect an existing wallet to inspect supported holdings and begin the explicit intelligence journey." />} wrongNetwork={<EmptyState title="Wrong network" detail="Switch to X Layer Testnet to read supported wallet or vault balances." warning />} authorized={<WorkspaceSourceContent source={source} wallet={<div id="overview">{walletContent}</div>} vault={<><WorkspaceNavigation targets={vaultNavigation} /><div id="overview">{vaultContent}</div>{client && vault.data ? <div id="policy" className="mt-6"><FinancialConstitutionPanel key={`${address}:${vault.data.status === "available" ? vault.data.address : "no-vault"}`} address={address!} client={client} vault={vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : undefined} onActiveChange={handleActiveConstitution} writesEnabled={false} /></div> : null}</>} />}/></WorkspacePanel>
   </div>;
 
 }

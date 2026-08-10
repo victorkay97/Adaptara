@@ -28,4 +28,32 @@ describe("vault discovery", () => {
   it("handles unconfigured, absent, and available vaults", async () => { expect(await discoverVault(client(), account)).toEqual({ status: "not-configured" }); expect(await discoverVault(client(), account, factory)).toEqual({ status: "not-created" }); expect(await discoverVault(client({ readContract: vi.fn().mockResolvedValue(vaultAddress) }), account, factory)).toEqual({ status: "available", address: vaultAddress }); });
   it("returns explicit wrong-chain and read errors", async () => { expect(await discoverVault(client({ getChainId: vi.fn().mockResolvedValue(1) }), account, factory)).toEqual({ status: "wrong-chain" }); expect((await discoverVault(client({ readContract: vi.fn().mockRejectedValue(new Error("RPC")) }), account, factory)).status).toBe("read-error"); });
   it("converts a chain ID RPC rejection into read-error", async () => { expect(await discoverVault(client({ getChainId: vi.fn().mockRejectedValue(new Error("chain unavailable")) }), account, factory)).toEqual({ status: "read-error", error: "chain unavailable" }); });
+  it("discovers the confirmed demo vault through the factory boundary", async () => {
+    const demoOwner = getAddress("0x7bc8489c39A750CCFa6C06d5d6dB5F682976234E");
+    const confirmedFactory = getAddress("0xBE65de08FFbF819B124cbD2C8C88C21bAcdA8c2e");
+    const confirmedVault = getAddress("0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4");
+    const readContract = vi.fn().mockResolvedValue(confirmedVault);
+    expect(await discoverVault(client({ readContract }), demoOwner, confirmedFactory)).toEqual({ status: "available", address: confirmedVault });
+    expect(readContract).toHaveBeenCalledWith(expect.objectContaining({ address: confirmedFactory, functionName: "vaultOf", args: [demoOwner] }));
+  });
+});
+
+describe("confirmed seeded vault reader shape", () => {
+  it("normalizes live-shaped RPC balances into the $20 demo reference allocation", async () => {
+    const assets = createAssetCatalog(sandboxAddresses);
+    const balances = new Map([
+      [assets[0].address!.toLowerCase(), 8_000_000n],
+      [assets[1].address!.toLowerCase(), 60_000_000_000_000_000n],
+      [assets[2].address!.toLowerCase(), 2_000_000_000_000_000n],
+      [assets[3].address!.toLowerCase(), 10_000_000_000_000_000n],
+    ]);
+    const readContract = vi.fn(async ({ address, functionName }: { address: string; functionName: string }) => functionName === "balanceOf" ? balances.get(address.toLowerCase())! : address.toLowerCase() === assets[0].address!.toLowerCase() ? 6 : 18);
+    const snapshot = await readVaultPortfolio({ client: client({ readContract }), accountAddress: vaultAddress, assets, priceProvider: new DemoReferencePriceProvider() });
+    expect(snapshot.source).toBe("vault");
+    expect(snapshot.positions.map((position) => position.displayBalance)).toEqual(["8", "0.06", "0.002", "0.01"]);
+    expect(snapshot.positions.map((position) => position.usdValue)).toEqual([800_000_000n, 600_000_000n, 400_000_000n, 200_000_000n]);
+    expect(snapshot.totals.totalUsdValue).toBe(2_000_000_000n);
+    expect(snapshot.positions.map((position) => position.allocationBps)).toEqual([4000, 3000, 2000, 1000]);
+    expect(snapshot.valuationStatus).toBe("valued");
+  });
 });

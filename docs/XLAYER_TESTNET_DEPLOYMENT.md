@@ -10,6 +10,10 @@ The demo vault was created successfully at `0xb49163f7A426c7f739F008AaAe062cCEc6
 
 The vault was successfully seeded with multiplier `2`: 8 USD₮0, 0.06 sTRSY, 0.002 sXAU, and 0.01 sAAPLx. At the explicitly demo/non-live reference prices, this is the documented $20 reference portfolio with a 40/30/20/10 allocation. The owner retains 2 USD₮0. The exact approval amounts were consumed and all four owner-to-vault allowances are zero. The vault remains unpaused, the Financial Constitution remains zero/uninitialized, and the demo-owner nonce after seeding is `18`. No Builder Code has been registered and explorer verification remains pending. All later planned steps below remain unexecuted.
 
+## Phase 12C1 read-only application wiring
+
+The browser application is configured for the confirmed X Layer Testnet AssetRegistry, AdaptiveVaultFactory, official test USD₮0, and three sandbox-token addresses through the documented public environment variables. Adaptara Vault discovery remains owner-driven through `AdaptiveVaultFactory.vaultOf(owner)`; the demo vault is not a product fallback. Live reads use ERC-20 `balanceOf` and `decimals` against the discovered vault, retain demo/non-live reference-price disclosures, and interpret the current all-zero Financial Constitution as not activated. Policy writes are deliberately disabled in the Phase 12C1 application path until Phase 12C2. This wiring adds no transaction, signing, Builder Code, executor, or autonomous authority; Builder Code is not integrated or registered.
+
 ## A. Prerequisites
 
 - Baseline: commit `c32ec6521e90509849ea61883bbde120ac114bf8`, branch `phase-12-xlayer-deployment-submission`.
