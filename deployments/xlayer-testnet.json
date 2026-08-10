@@ -28,7 +28,16 @@
     "configuration": [
       "0x6405dbbf131d7bfad89c2c5257cf5c2e94733fa81b2a5f55f9dc886e9b216dd4"
     ],
-    "seeding": [],
+    "seeding": [
+      "0x5ee7f0b31a99c2d020060c591ebe877c7b07aa64217eda583fbfa53cc8ec5137",
+      "0xf1a90a5e61a79147bff47c5eb1cb55a6e0f465a26b4d7ef6cb37df565674f85b",
+      "0x09c21c0f7cc3586f88abd146a427a828693c7d84b93abfdaed4d43f1475083a3",
+      "0xaca0c5451f9d34d2ab1d9ea52654e9a42ed4e2acbf5f786e2d41b08caee5a579",
+      "0x840cf97a7f5a4456b03bd979b48074124b32393afb407158327f7b4d55346d6b",
+      "0x4049206b32cada4bfc8040d4a11bbee78d589dcb1c9aa0263576d3b1f40733ad",
+      "0x3823484fc4f9921ab7ba022bf4bb27a90032908b5e86a992129402923a520c99",
+      "0xa641d765bfc4a05e956e462523425116a02287115cf5759c81c0e24d99c70de3"
+    ],
     "builderCodeRegistration": null
   },
   "verificationStatus": {
