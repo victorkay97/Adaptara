@@ -24,7 +24,7 @@ export function SentinelPanel({ snapshot, assessment, onAssessmentChange }: { sn
       onAssessmentChange(data.assessment, started); setRequest(null);
     } catch { if (sentinelCompletionForContext(started, contextRef.current, true)) setRequest({ contextKey: started, status: "error" }); }
   }
-  return <section className="mt-6 rounded-2xl border border-[#d4b56b] bg-[#fffaf0] p-5" aria-label="Adaptara Sentinel">
+  return <section id="intelligence" className="mt-6 rounded-2xl border border-[#d4b56b] bg-[#fffaf0] p-5" aria-label="Adaptara Sentinel">
     <div className="flex flex-wrap items-center justify-between gap-3"><div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#8a621d]">Adaptara Sentinel</p><h3 className="mt-2 text-xl font-semibold">Event monitoring</h3></div><span className="rounded-full border border-[#d4b56b] px-3 py-1 text-xs font-bold">Demo event feed · non-live</span></div>
     <p className="mt-2 text-sm text-[var(--muted)]">User-triggered deterministic event-risk screening. Sentinel cannot call MARA, create a plan, or execute a transaction.</p>
     <button type="button" onClick={scan} disabled={status === "scanning"} className="mt-4 rounded-xl bg-[#8a621d] px-4 py-2 font-semibold text-white disabled:opacity-50">{status === "scanning" ? "Scanning demo events…" : "Run Sentinel Scan"}</button>

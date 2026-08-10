@@ -26,7 +26,7 @@ export function AdaptationPlanPanel({ snapshot, assessment, constitution, analys
     if (!analysis || !constitution) return;
     setPlanned({ contextKey, plan: createAdaptationPlan({ snapshot, riskAssessment: assessment, constitution, maraAnalysis: analysis }) });
   };
-  return <section className="mt-6 rounded-2xl border border-[#9db9a8] bg-[#f2f8f4] p-5" aria-label="Adaptation Plan">
+  return <section id="strategy" className="mt-6 rounded-2xl border border-[#9db9a8] bg-[#f2f8f4] p-5" aria-label="Adaptation Plan">
     <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#236a4a]">Deterministic Adaptation Engine</p>
     <div className="mt-2 flex flex-wrap items-center justify-between gap-3"><h3 className="text-xl font-semibold">Adaptation Plan</h3><span className="rounded-full border border-[#9db9a8] px-3 py-1 text-xs font-bold">Simulation · not executed</span></div>
     <p className="mt-2 text-sm text-[var(--muted)]">MARA supplies direction only. Adaptara deterministically selects exact bounded allocation BPS under the active onchain constitution.</p>

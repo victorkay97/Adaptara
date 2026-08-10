@@ -8,13 +8,13 @@
 6. **Phase 6 — Financial Constitution (complete)**
 7. **Phase 7 — Adaptation Engine (complete)**
 8. **Phase 8 — Sentinel / Event Monitoring (complete)**
-9. **Phase 9 — Yield & Compounding (current)**
-10. Phase 10 — Full UX
+9. **Phase 9 — Yield & Compounding (complete)**
+10. **Phase 10 — Full Product UX & Demo Experience (current)**
 11. Phase 11 — Security & Adversarial Testing
 12. Phase 12 — X Layer Deployment & Submission
 13. Phase 13 — Demo Rehearsal
 
-Only Phase 9 is currently in scope; later labels describe intent, not implemented capability.
+Only Phase 10 is currently in scope. Phase 11 is not implemented.
 
 # Current phase status
 
@@ -26,4 +26,5 @@ Only Phase 9 is currently in scope; later labels describe intent, not implemente
 - Phase 6 — Complete
 - Phase 7 — Complete
 - Phase 8 — Complete
-- Phase 9 — Current
+- Phase 9 — Complete
+- Phase 10 — Current

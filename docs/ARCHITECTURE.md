@@ -1,5 +1,9 @@
 # Architecture
 
+## Phase 10 presentation layer
+
+The Phase 10 application shell and portfolio workspace compose the existing Portfolio, Sentinel, Risk, MARA, Adaptation, Yield, and Financial Constitution modules. Source selection and readiness summaries are views over existing query/account state; they do not duplicate domain calculations or introduce RPC queries. The presentation layer is not an authority layer and cannot turn advisory or simulated output into transaction authority.
+
 ## Phase 2 onchain foundation
 
 ```text

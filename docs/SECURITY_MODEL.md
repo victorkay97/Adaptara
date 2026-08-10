@@ -1,5 +1,9 @@
 # Security Model
 
+## Phase 10 UX boundary
+
+The UX restructuring does not change authority boundaries. Sentinel, MARA, Adaptation Simulation, and Yield Intelligence remain explicitly user-triggered, and source switching invokes none of them. Phase 10 introduces no signer, API, provider, or write surface. The previously reviewed owner-confirmed Financial Constitution update remains the only UI write behavior.
+
 AI is untrusted and may be mistaken, manipulated, or compromised. A backend is not sufficient authority over funds. Recommendations require typed proposals, deterministic validation, and contract-level policy enforcement. Users must explicitly confirm financial policy. Secrets remain server-only; testnet configuration fails closed when invalid.
 
 ## Phase 2 authorities

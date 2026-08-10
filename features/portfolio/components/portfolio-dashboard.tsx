@@ -25,6 +25,7 @@ import { overlaySentinelStress, riskAssessedAtWithSentinel, sentinelInfluencesPo
 import { sentinelAssessmentForContext, sentinelContextFingerprint } from "@/features/sentinel/context";
 import type { ContextScopedSentinelAssessment, SentinelAssessment } from "@/features/sentinel/types";
 import { YieldPanel } from "@/features/yield/components/yield-panel";
+import { canReadVaultPortfolio, deriveVaultNavigation, deriveWorkspaceReadiness, hasUsableVaultSnapshot, ReadinessSummary, SourceSwitcher, WorkspaceAuthorityGate, WorkspaceNavigation, WorkspacePanel, WorkspaceSourceContent, type PortfolioSource } from "@/features/dashboard/components/workspace-controls";
 
 const demoPrices = new DemoReferencePriceProvider();
 const displayNumber = (value: string) => { const [whole, fraction] = value.split("."); return `${BigInt(whole).toLocaleString()}${fraction ? `.${fraction.slice(0, 4)}` : ""}`; };
@@ -102,26 +103,38 @@ function SnapshotPanel({ title, snapshot, constitution }: { title: string; snaps
   </section>;
 }
 
+function LoadingCard({ label }: { label: string }) { return <div className="loading-card" role="status" aria-live="polite"><span className="skeleton-line" /><span className="skeleton-line short" /><p>{label}...</p></div>; }
+function EmptyState({ title, detail, warning = false }: { title: string; detail: string; warning?: boolean }) { return <section className={`empty-state ${warning ? "warning" : ""}`}><p className="eyebrow">Workspace status</p><h2>{title}</h2><p>{detail}</p></section>; }
+function ErrorCard({ message }: { message: string }) { return <div className="empty-state error" role="alert"><h2>Portfolio unavailable</h2><p>{message}</p></div>; }
+
 export function PortfolioDashboard() {
+  const [source, setSource] = useState<PortfolioSource>("wallet");
   const [activeConstitution, setActiveConstitution] = useState<OnchainConstitution | null>(null);
   const handleActiveConstitution = useCallback((value: OnchainConstitution | null) => setActiveConstitution(value), []);
   const { address, chain, isConnected } = useAccount();
+  const connected = Boolean(isConnected && address);
   const client = usePublicClient({ chainId: xLayerTestnet.id });
   const onXLayer = chain?.id === xLayerTestnet.id;
   const wallet = useQuery({ queryKey: ["portfolio", "wallet", address], enabled: Boolean(address && onXLayer && client), queryFn: () => readWalletPortfolio({ client: client!, accountAddress: address!, assets: ASSET_CATALOG, priceProvider: demoPrices }) });
   const factoryAddress = publicEnv.NEXT_PUBLIC_ADAPTARA_FACTORY_ADDRESS ? getAddress(publicEnv.NEXT_PUBLIC_ADAPTARA_FACTORY_ADDRESS) : undefined;
   const vault = useQuery({ queryKey: ["vault-discovery", address, factoryAddress], enabled: Boolean(address && onXLayer && client), queryFn: () => discoverVault(client!, address!, factoryAddress) });
-  const vaultPortfolio = useQuery({ queryKey: ["portfolio", "vault", vault.data?.status === "available" ? vault.data.address : null], enabled: Boolean(client && vault.data?.status === "available"), queryFn: () => {
+  const vaultPortfolio = useQuery({ queryKey: ["portfolio", "vault", vault.data?.status === "available" ? vault.data.address : null], enabled: canReadVaultPortfolio(Boolean(onXLayer), Boolean(client), vault.data?.status), queryFn: () => {
     const discovered = vault.data;
     if (!client || discovered?.status !== "available") throw new Error("Vault is not available");
     return readVaultPortfolio({ client, accountAddress: discovered.address, assets: ASSET_CATALOG, priceProvider: demoPrices });
   } });
 
-  if (!isConnected || !address) return <section className="rounded-3xl border border-[var(--line)] bg-white/70 p-8 text-center"><h2 className="text-2xl font-semibold">Portfolio intelligence</h2><p className="mt-3 text-[var(--muted)]">Connect your wallet to view your Adaptara-supported portfolio.</p></section>;
-  if (!onXLayer) return <section className="rounded-3xl border border-amber-200 bg-amber-50 p-8 text-center"><h2 className="text-2xl font-semibold">Wrong network</h2><p className="mt-3 text-amber-900">Switch to X Layer Testnet to read supported portfolio balances.</p></section>;
-  return <div className="grid gap-6">
-    {wallet.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Reading wallet balances…</p> : wallet.isError ? <p className="rounded-3xl bg-red-50 p-8 text-red-800" role="alert">Wallet portfolio unavailable: {wallet.error.message}</p> : wallet.data ? <SnapshotPanel title="Your Wallet" snapshot={wallet.data} /> : null}
-    <section>{vault.isPending ? <p className="rounded-3xl bg-white/70 p-8" role="status">Discovering Adaptara Vault…</p> : vault.data?.status === "not-configured" ? <VaultUnavailablePanel message="Vault integration not deployed yet." /> : vault.data?.status === "not-created" ? <VaultUnavailablePanel message="No Adaptara Vault found." /> : vault.data?.status === "read-error" ? <VaultUnavailablePanel message={`Vault discovery unavailable: ${vault.data.error}`} role="alert" /> : vaultPortfolio.isPending ? <p className="rounded-3xl bg-white/70 p-8">Reading vault balances…</p> : vaultPortfolio.isError ? <VaultUnavailablePanel message={`Vault portfolio unavailable: ${vaultPortfolio.error.message}`} role="alert" /> : vaultPortfolio.data ? <SnapshotPanel title="Adaptara Vault" snapshot={vaultPortfolio.data} constitution={activeConstitution ?? undefined} /> : null}</section>
-    {client && vault.data ? <FinancialConstitutionPanel key={`${address}:${vault.data.status === "available" ? vault.data.address : "no-vault"}`} address={address} client={client} vault={vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : wallet.data} onActiveChange={handleActiveConstitution} /> : null}
+  const readiness = deriveWorkspaceReadiness({ isConnected: connected, onXLayer: Boolean(onXLayer), source, wallet, vault, vaultPortfolio });
+  const hasPolicy = Boolean(client && vault.data);
+  const usableVaultSnapshot = hasUsableVaultSnapshot(vault.data?.status, vaultPortfolio);
+  const vaultNavigation = deriveVaultNavigation(usableVaultSnapshot, hasPolicy);
+  const vaultContent = vault.isPending ? <LoadingCard label="Discovering Adaptara Vault" /> : vault.data?.status === "not-configured" ? <VaultUnavailablePanel message="Vault integration is not configured in this environment. An Adaptara Vault is an isolated smart-contract vault governed by your Financial Constitution." /> : vault.data?.status === "not-created" ? <VaultUnavailablePanel message="No Adaptara Vault has been created for this wallet. Vault creation is not enabled in Phase 10." /> : vault.data?.status === "read-error" ? <VaultUnavailablePanel message={`Vault discovery unavailable: ${vault.data.error}`} role="alert" /> : vaultPortfolio.isPending ? <LoadingCard label="Reading vault portfolio" /> : vaultPortfolio.isError ? <VaultUnavailablePanel message={`Vault portfolio unavailable: ${vaultPortfolio.error.message}`} role="alert" /> : vaultPortfolio.data ? <SnapshotPanel title="Adaptara Vault" snapshot={vaultPortfolio.data} constitution={activeConstitution ?? undefined} /> : null;
+  const walletContent = wallet.isPending ? <LoadingCard label="Reading wallet portfolio" /> : wallet.isError ? <ErrorCard message={`Wallet portfolio unavailable: ${wallet.error.message}`} /> : wallet.data ? <SnapshotPanel title="Your Wallet" snapshot={wallet.data} /> : null;
+
+  return <div className="workspace-shell">
+    <div className="workspace-intro"><div><p className="eyebrow">Portfolio workspace</p><h2>One source. Clear intelligence.</h2><p>Choose a supported wallet for read-only intelligence, or an Adaptara Vault for policy-bounded strategy simulations.</p></div><SourceSwitcher value={source} onChange={setSource} /></div>
+    <ReadinessSummary readiness={readiness} />
+    <WorkspacePanel source={source}><WorkspaceAuthorityGate isConnected={connected} onXLayer={Boolean(onXLayer)} disconnected={<EmptyState title="Connect your wallet" detail="Connect an existing wallet to inspect supported holdings and begin the explicit intelligence journey." />} wrongNetwork={<EmptyState title="Wrong network" detail="Switch to X Layer Testnet to read supported wallet or vault balances." warning />} authorized={<WorkspaceSourceContent source={source} wallet={<div id="overview">{walletContent}</div>} vault={<><WorkspaceNavigation targets={vaultNavigation} /><div id="overview">{vaultContent}</div>{client && vault.data ? <div id="policy" className="mt-6"><FinancialConstitutionPanel key={`${address}:${vault.data.status === "available" ? vault.data.address : "no-vault"}`} address={address!} client={client} vault={vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : undefined} onActiveChange={handleActiveConstitution} /></div> : null}</>} />}/></WorkspacePanel>
   </div>;
+
 }
