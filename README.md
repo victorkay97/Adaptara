@@ -36,9 +36,9 @@ The product is designed around this loop:
 
 ## MARA
 
-MARA—the **Market Adaptive Risk Agent**—interprets portfolio state, explains sandbox RWA exposure, reasons about risk, considers bounded event context, and produces strategy recommendations. Its output is structured and post-validated before display.
+MARA—the **Market Adaptive Risk Agent**—interprets portfolio state, explains sandbox RWA exposure, reasons about risk, considers bounded event context, and produces strategy recommendations. Its structured output is validated deterministically before display. A semantic validation failure may receive at most one server-owned corrective generation, for a maximum of two application model attempts; provider failures are not application-remediated.
 
-MARA has no private key, signer, wallet tools, arbitrary transaction authority, or autonomous execution path. It does not guarantee returns or claim reliable price prediction.
+MARA has no private key, signer, wallet tools, arbitrary transaction authority, or autonomous execution path. It cannot choose BPS or transaction routes. Actionable `reduce_exposure` and `diversify` proposals must identify the specific exposure to reduce; when evidence does not support one, `review` or `maintain` remains a legitimate no-action direction. It does not guarantee returns or claim reliable price prediction.
 
 ## Deterministic Risk Engine
 
@@ -123,15 +123,15 @@ sTRSY, sXAU, and sAAPLx are fixed-supply testnet demonstration assets. They prov
 
 ## Sentinel
 
-Sentinel provides advisory event monitoring over bounded demo/non-live observations. Event context may influence the deterministic market-stress factor, but news and events never directly move money. Sentinel cannot call MARA, create a transaction, or invoke Adaptation without an explicit user action.
+Sentinel provides advisory event monitoring over a bounded, server-side deterministic demo/non-live fixture feed. It uses no external news/web source or OpenAI. Corroboration and expiry determine whether an event may influence the deterministic market-stress factor, but events never directly move money. Sentinel cannot call MARA, generate Adaptation, or execute. When a scan changes deterministic risk context, the previous MARA advisory and dependent Adaptation Plan are invalidated; both require fresh explicit user actions.
 
 ## Adaptation Engine
 
-The Adaptation Engine deterministically converts eligible MARA direction into a constrained allocation simulation. It chooses basis-point changes under the active Constitution and application safety limits. It cannot sign, trade, move tokens, or bypass the Constitution.
+The Adaptation Engine converts eligible MARA direction and a targeted exposure into a deterministic allocation simulation. Adaptara—not MARA—chooses the receiver and exact BPS, bounded by the 500-BPS application step and active Constitution daily limit. Null-target `reduce_exposure`/`diversify` directions fail closed; `maintain`/`review` may correctly produce no action. Diversify prefers eligible non-Aggressive receivers before baseline-Aggressive receivers. The Constitution remains the final policy gate, `executionAuthority` remains `none`, and no rebalance, trade, or router exists.
 
 ## Yield Intelligence
 
-Yield Intelligence is a deterministic, non-live compounding projection using transparent fixture terms. It does not connect to a yield protocol, deploy capital, alter vault balances, or claim earned yield.
+Yield Intelligence is a deterministic sandbox compounding simulation for the current sTRSY demo principal using a fixed demo annualized rate. The rate is not sourced from a live protocol. The simulation does not project future USD returns, connect to a yield protocol, deploy capital, alter vault balances, or claim earned, guaranteed, redeemable, or claimable yield.
 
 ## Security Model
 
@@ -149,7 +149,7 @@ See [Security Model](docs/SECURITY_MODEL.md) and [Security Review](docs/SECURITY
 
 ## Testing
 
-- TypeScript: **402 passed** across **37 files**
+- TypeScript: **437 passed** across **38 files**
 - Foundry: **67 passed** across **7 suites**, 0 failed, 0 skipped
 - ESLint: passed
 - TypeScript typecheck: passed
@@ -200,7 +200,7 @@ For the read-only deployment preflight, provide the public `DEPLOYER_ADDRESS` an
 3. Inspect live onchain balances and the 40/30/20/10 demo allocation.
 4. Review deterministic risk and Constitution compliance.
 5. Request and review MARA's advisory analysis.
-6. Review Sentinel, Adaptation, and Yield panels with their demo/simulation labels.
+6. Review Adaptation while the current MARA advisory is current, then Yield Intelligence, and run Sentinel last. Yield's hypothetical simulation does not invalidate MARA or Adaptation; a risk-changing Sentinel scan invalidates stale MARA and Adaptation state rather than regenerating either automatically.
 7. Show the active owner-controlled Financial Constitution.
 8. Open the Builder registration and ERC-8021 proof transactions.
 9. Explain that AI recommends, while the owner and contracts retain authority.
@@ -231,8 +231,8 @@ The complete deployment manifest is [deployments/xlayer-testnet.json](deployment
 
 ## Hackathon Status / Submission Links
 
-- **GitHub:** TBD — public repository URL required
-- **Live demo:** TBD — deployed application URL required
+- **GitHub:** https://github.com/victorkay97/Adaptara
+- **Live demo:** https://adaptara.vercel.app/
 - **Demo video:** TBD — demo-video URL required
 - **Team:** TBD — authoritative team information required
 

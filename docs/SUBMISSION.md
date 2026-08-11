@@ -28,7 +28,7 @@ The AI can reason about changing conditions, but cannot sign, bypass policy, or 
 
 ## How AI is used
 
-MARA—the Market Adaptive Risk Agent—receives privacy-minimized portfolio, risk, policy, and bounded event context. It interprets exposure, explains sandbox RWA characteristics, reasons about risk, and produces structured strategy recommendations. Its output is untrusted until strict application validation and remains advisory. MARA has no wallet key, signing capability, transaction tools, guaranteed-return claim, or price-prediction authority.
+MARA—the Market Adaptive Risk Agent—receives privacy-minimized portfolio, risk, policy, and bounded event context. It interprets exposure, explains sandbox RWA characteristics, reasons about risk, and produces structured strategy recommendations. Its output is untrusted until strict deterministic validation and remains advisory. An eligible semantic failure may receive one server-owned corrective generation, with at most two application model attempts; provider failures are not application-remediated. MARA has no wallet key, signing capability, transaction tools, BPS or routing authority, guaranteed-return claim, or price-prediction authority. Actionable exposure-reduction directions identify a specific exposure; otherwise MARA may recommend review or maintenance.
 
 ## How X Layer is used
 
@@ -70,7 +70,7 @@ Each owner has an isolated, non-upgradeable vault. Ownership transfer and renunc
 1. Connect the demo owner on X Layer Testnet and discover the factory-created vault.
 2. Show live balances and the demo/non-live $20 reference portfolio at 40/30/20/10.
 3. Review deterministic risk, active Constitution, and compliance.
-4. Review MARA, Sentinel, Adaptation, and Yield with their advisory/simulation boundaries.
+4. Review MARA, then Adaptation, then Yield, and run Sentinel last, with their advisory/simulation boundaries. Adaptara chooses bounded BPS and receivers deterministically; Yield does not invalidate MARA or Adaptation, while a risk-changing Sentinel scan invalidates stale MARA and Adaptation state without automatic regeneration.
 5. Open the Builder registration and mined attribution proof.
 6. Close with the separation between AI recommendations and owner/contract authority.
 
@@ -91,15 +91,21 @@ Each owner has an isolated, non-upgradeable vault. Ownership transfer and renunc
 | Builder registration | [Transaction, block 37942149](https://www.oklink.com/x-layer-testnet/tx/0x62d2c221dc73a44502e78529d5add9ad4cca51329377beab6064d51d041b61ef) |
 | ERC-8021 proof | [Transaction, block 37947454](https://www.oklink.com/x-layer-testnet/tx/0x7fdfecc0b989992c33e4e586f56a508bae2c0d5f4b70e650960267e54e56493e) |
 
-Contracts are deployed but explorer source verification remains pending. Validation currently passes 402 TypeScript tests and 67 Foundry tests across seven suites.
+Contracts are deployed but explorer source verification remains pending. Validation currently passes 437 TypeScript tests across 38 files and 67 Foundry tests across seven suites.
+
+## Production acceptance
+
+Manual production acceptance passed against the public application for X Layer Testnet vault discovery and the canonical $20 demo/non-live reference portfolio, the active 20/60/30/10 Financial Constitution, MARA advisory analysis, deterministic Adaptation, sandbox Yield Intelligence, and Sentinel demo event monitoring. Sentinel's deterministic risk-context integration correctly invalidated the prior MARA advisory and dependent Adaptation Plan; neither regenerated automatically. No wallet signature or transaction was requested during acceptance.
+
+Sentinel uses a server-side deterministic demo/non-live fixture feed with no external news/web source or OpenAI. Corroboration and expiry govern event-stress influence, and Sentinel cannot call MARA, generate Adaptation, or execute. Yield Intelligence uses the current sTRSY demo principal and a fixed demo annualized rate for a deterministic sandbox compounding simulation; it is not live-protocol yield and creates no earned, guaranteed, redeemable, claimable, or future-USD-return result.
 
 ## Limitations
 
 Adaptara is testnet hackathon software. sTRSY, sXAU, and sAAPLx are sandbox tokens with no backing, ownership, collateral, redemption, or guaranteed value. Reference prices are demo/non-live inputs, not market or oracle prices. Adaptara has no autonomous execution, AI signing authority, real RWA redemption, live yield execution, reliable price prediction, pooled custody, or trading/rebalancing router.
 
-## Links still required
+## Submission links
 
-- **GitHub:** TBD — public repository URL required
-- **Live app:** TBD — deployed application URL required
+- **GitHub:** https://github.com/victorkay97/Adaptara
+- **Live app:** https://adaptara.vercel.app/
 - **Demo video:** TBD — demo-video URL required
 - **Team:** TBD — authoritative team information required

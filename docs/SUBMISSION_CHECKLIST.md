@@ -19,15 +19,28 @@ This checklist reflects the current submission-packaging state. A `READY` item h
 - [x] Active Constitution: 20% reserve / 60% single asset / 30% aggressive / 10% daily reallocation
 - [x] AI explanation: MARA is advisory and cannot sign or send transactions
 - [x] Security model and Phase 11 adversarial review
-- [x] Test evidence: 402 TypeScript tests; 67 Foundry tests across 7 suites
+- [x] Test evidence: 437 TypeScript tests across 38 files; 67 Foundry tests across 7 suites
+- [x] Public GitHub repository: https://github.com/victorkay97/Adaptara
+- [x] Live application: https://adaptara.vercel.app/
 - [x] Demo flow: `docs/DEMO_GUIDE.md`
 - [x] Sandbox disclosure: sTRSY, sXAU, and sAAPLx confer no backing, redemption, collateral, or ownership rights
 - [x] Known limitations: no autonomous/trading execution, real redemption, live yield, price prediction, or pooled custody
 
-## NEEDS URL
+## PRODUCTION ACCEPTANCE — MANUAL
 
-- [ ] GitHub: `TBD — public repository URL required`
-- [ ] Live application: `TBD — deployed application URL required`
+- [x] Public application reachable
+- [x] Canonical demo-owner vault discovered on X Layer Testnet
+- [x] Canonical demo/non-live $20 reference portfolio displayed at 40/30/20/10
+- [x] Active Constitution displayed at 20% reserve / 60% single asset / 30% aggressive / 10% daily reallocation
+- [x] MARA completed a real production advisory analysis
+- [x] Deterministic Adaptation production acceptance passed, including legitimate review/maintain no-action behavior
+- [x] Sandbox Yield Intelligence production acceptance passed
+- [x] Sentinel demo/non-live event-monitoring production acceptance passed
+- [x] Sentinel influenced deterministic risk context only through corroboration/expiry rules
+- [x] Risk-context change invalidated stale MARA advisory
+- [x] Risk-context change invalidated stale dependent Adaptation Plan
+- [x] No automatic MARA or Adaptation regeneration occurred
+- [x] No wallet signature or transaction occurred during acceptance
 
 ## NEEDS SCREENSHOT
 

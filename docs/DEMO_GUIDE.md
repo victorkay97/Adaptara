@@ -49,11 +49,13 @@ Target length: approximately 3–5 minutes. The times below are guides, not hard
 - Highlight portfolio interpretation, risk reasoning, RWA explanation, and structured recommendations.
 - State that MARA has no private key, signer, or autonomous transaction tools.
 
-### 2:25–2:50 — Sentinel, Adaptation, and Yield
+### 2:25–2:50 — Adaptation, Yield, and Sentinel
 
-- Show Sentinel's bounded advisory event context.
-- Show Adaptation as a deterministic allocation recommendation/simulation constrained by the Constitution.
-- Show Yield Intelligence as a non-live compounding projection, not deployed yield or earned returns.
+1. Show Adaptation while the current validated MARA advisory is still current. Explain that it is a deterministic allocation recommendation/simulation constrained by the Constitution.
+2. Show Yield Intelligence as a non-live compounding projection, not deployed yield or earned returns. Its hypothetical simulation does not invalidate MARA or Adaptation.
+3. Run or show Sentinel last and explain its bounded advisory event context.
+4. Explain that a risk-changing Sentinel scan intentionally makes the previous MARA advisory and dependent Adaptation Plan stale, without automatically regenerating either.
+5. If useful, briefly show the disabled/stale Adaptation state. Do not rerun MARA during the recording unless needed.
 
 ### 2:50–3:20 — Security model
 
@@ -93,7 +95,7 @@ Target length: approximately 3–5 minutes. The times below are guides, not hard
 - Demo vault: `0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4`
 - AssetRegistry and AdaptiveVaultFactory addresses
 - Active Constitution and exact demo balances
-- 402 passing TypeScript tests
+- 437 passing TypeScript tests across 38 files
 - 67 passing Foundry tests across 7 suites
 
 ## Final recording checklist
