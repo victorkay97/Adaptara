@@ -29,7 +29,7 @@ Vaults do not keep shadow asset balances. ERC-20 `balanceOf` state is authoritat
 
 Anyone can transfer ERC-20 balances directly into a vault without calling `deposit`. Future portfolio-policy enforcement must tolerate unsolicited balances: a donation must not permanently freeze a vault in a noncompliant state, and corrective or risk-reducing actions must remain possible. Phase 2 documents this constraint but does not implement future valuation, policy enforcement, or risk logic.
 
-## Contract security rules
+## Phase 2 contract and future-execution security rules
 
 1. No arbitrary external-call function for the AI executor.
 2. Agent executor follows least privilege.
@@ -37,8 +37,8 @@ Anyone can transfer ERC-20 balances directly into a vault without calling `depos
 4. Agent cannot change ownership.
 5. Agent cannot change oracle configuration.
 6. Agent cannot change financial policies.
-7. Every rebalance is validated onchain.
-8. Oracle staleness is checked.
+7. Any future rebalance execution must be validated onchain.
+8. Any future oracle integration must enforce staleness checks.
 9. Unsupported assets revert.
 10. Emergency pause blocks deposits and future automated operations without blocking owner exits.
 11. Contracts remain non-upgradeable for the hackathon.
@@ -46,11 +46,11 @@ Anyone can transfer ERC-20 balances directly into a vault without calling `depos
 
 Phase 2 is testnet-only, includes custody and authorization foundations but no management or trading logic, and makes no production-security claim.
 
-## Phase 3 read-only portfolio security
+## Phase 3 read-only portfolio security (historical layer boundary)
 
 The portfolio module performs public reads only. It has no transaction, approval, signature, executor-key, or contract-write authority. A failed RPC or token read is an explicit unavailable/error state and is never represented as a zero balance, because zero is valid financial data. Deployed token decimals are checked against expected product metadata; mismatches fail closed as configuration errors.
 
-A configured asset with a failed read or configuration error has an unknown balance and prevents a complete valuation. Known zero remains distinct and does not degrade completeness. Assets without deployed/configured addresses are outside live onchain completeness rather than being treated as unreadable balances. Partial totals are valued subtotals only, and allocation BPS are withheld unless the entire supported portfolio is fully valued. A future Risk Engine must reject or explicitly degrade any calculation that requires complete portfolio valuation; no Risk Engine is implemented in Phase 3.
+A configured asset with a failed read or configuration error has an unknown balance and prevents a complete valuation. Known zero remains distinct and does not degrade completeness. Assets without deployed/configured addresses are outside live onchain completeness rather than being treated as unreadable balances. Partial totals are valued subtotals only, and allocation BPS are withheld unless the entire supported portfolio is fully valued. At the Phase 3 boundary, the Risk Engine was not yet implemented; the completed Phase 4 engine now rejects or explicitly degrades calculations that require complete portfolio valuation.
 
 Portfolio discovery covers only the configured Adaptara-supported catalog. Unsolicited tokens can exist in wallets and vaults but are not enumerated or silently treated as supported exposure. Wallet and vault sources are displayed separately, and onchain balances remain authoritative.
 
@@ -88,3 +88,7 @@ Sentinel cannot invoke MARA or adaptation and cannot sign or send transactions. 
 Fixture yield terms are transparent demo inputs, not market or protocol truth. The canonical provider, rather than user input, supplies the rate. Projection uses deterministic, round-down `BigInt` arithmetic and never creates a fake future `PortfolioSnapshot`.
 
 Yield Intelligence has no signer, transaction, protocol adapter, network, or arbitrary execution surface and cannot change risk, Sentinel, MARA, Constitution, or Adaptation authority. Future real yield protocols require separate adapter design and security review.
+
+## Current integrated security status
+
+The deterministic Risk Engine is implemented, and configured portfolio reads use live X Layer onchain balances while retaining demo/non-live valuation references. The Financial Constitution is active in the deployed, non-upgradeable demo vault; `setPolicy` remains an explicit owner-controlled wallet write with receipt confirmation and an onchain reread. MARA remains advisory, Sentinel remains non-executing, Adaptation and Yield remain simulations, and none receives a signing key or arbitrary transaction authority. ERC-8021 Builder attribution is metadata appended to the existing owner write and grants no contract or asset authority. The vault contracts remain constrained: no pooled custody, generic execute, arbitrary call, `delegatecall`, trading router, or autonomous execution path has been added.

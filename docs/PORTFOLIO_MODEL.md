@@ -1,6 +1,6 @@
 # Portfolio Model
 
-Phase 3 models an **Adaptara-supported portfolio**, not every token an address may contain.
+Phase 3 established the **Adaptara-supported portfolio** model, not an index of every token an address may contain. This document preserves that layer's design while noting the current integrated product state.
 
 ## Assets and identifiers
 
@@ -20,7 +20,7 @@ Reference prices use eight decimals (`PRICE_DECIMALS = 8`) and integer math. Pha
 
 Allocations use 10,000 BPS and exist only when `valuationStatus` is `valued`. Each position is floored using integer division; the remainder is assigned to the largest-valued position, with catalog order breaking ties. Thus complete allocations sum to exactly 10,000 BPS. Every position has `allocationBps = null` for `partial` and `unavailable`; the application never presents the valued subset as whole-portfolio composition.
 
-A future Risk Engine must reject or explicitly degrade calculations whenever required portfolio valuation is incomplete. Phase 3 does not implement those risk calculations.
+At the time of Phase 3, the Risk Engine was future work. The Phase 4 deterministic Risk Engine now exists and rejects or explicitly degrades calculations whenever required portfolio valuation is incomplete. Current configured portfolio reads use live X Layer onchain balances and verified decimals; valuation still uses the explicitly demo/non-live references above. The system makes no live-market or price-prediction claim.
 
 ## Snapshot provenance
 

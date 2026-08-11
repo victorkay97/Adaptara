@@ -1,22 +1,55 @@
 # Adaptara Submission Checklist
 
-Phase 12A reserves these fields only. No link, address, transaction, screenshot, or confirmation may be fabricated.
+This checklist reflects the current submission-packaging state. A `READY` item has repository evidence; unresolved external assets remain explicitly open.
 
-- [ ] Product URL: `TBD after deployment`
-- [ ] GitHub URL: `TBD`
-- [ ] Demo video: `TBD`
-- [ ] X Layer explorer — AssetRegistry: `TBD after confirmed deployment`
-- [ ] X Layer explorer — AdaptiveVaultFactory: `TBD after confirmed deployment`
-- [ ] X Layer explorer — AdaptiveVault: `TBD after confirmed deployment`
-- [ ] X Layer explorer — sTRSY/sXAU/sAAPLx: `TBD after confirmed deployment`
-- [ ] Deployment transactions: `TBD after confirmations`
-- [ ] Configuration/vault transaction: `TBD after confirmation`
-- [ ] Seed transactions: `TBD after confirmations`
-- [ ] Builder Code attribution transaction: `TBD after Phase 12C`
-- [ ] Architecture summary: isolated owner vault; shared registry; fixed-supply testnet sandbox ERC-20s; no proxy, pooling, ERC-4626, or generic execution
-- [ ] AI explanation: MARA is advisory and cannot sign or send transactions; deterministic/onchain boundaries retain authority
-- [ ] Security explanation: owner wallet signs writes; blockchain state is authoritative; guardian can only pause; executor is unset for demo
-- [ ] Sandbox disclosure: sTRSY, sXAU, and sAAPLx have no redemption rights, backing, investment value, or real-world ownership claim
-- [ ] Known limitations: Adaptation and Yield are simulation-only; Sentinel is non-executing; no trading/rebalancing execution exists
-- [ ] Screenshots: `TBD after browser verification`
-- [ ] Submission confirmation: `TBD after explicit manual submission`
+## READY
+
+- [x] Product name: Adaptara
+- [x] Tagline: Adaptive intelligence for onchain wealth.
+- [x] Short and long submission copy: `docs/SUBMISSION.md`
+- [x] Architecture: advisory intelligence separated from deterministic/onchain authority
+- [x] X Layer usage: live testnet contracts, reads, owner actions, and deployment evidence
+- [x] Builder Code: `tl5ce7n7gk5a5pzk`
+- [x] Builder registration proof: [OKLink transaction](https://www.oklink.com/x-layer-testnet/tx/0x62d2c221dc73a44502e78529d5add9ad4cca51329377beab6064d51d041b61ef)
+- [x] ERC-8021 attributed proof: [OKLink transaction](https://www.oklink.com/x-layer-testnet/tx/0x7fdfecc0b989992c33e4e586f56a508bae2c0d5f4b70e650960267e54e56493e)
+- [x] Deployment addresses and manifest: `deployments/xlayer-testnet.json`
+- [x] Vault creation: [OKLink transaction](https://www.oklink.com/x-layer-testnet/tx/0x6405dbbf131d7bfad89c2c5257cf5c2e94733fa81b2a5f55f9dc886e9b216dd4)
+- [x] Constitution activation: [OKLink transaction](https://www.oklink.com/x-layer-testnet/tx/0x92d8a51ae653027dccf22ef4b7d361996163c031a23d442290f8548f8d1a640b)
+- [x] Contract evidence: deployed on X Layer Testnet; explorer source verification remains pending
+- [x] Active Constitution: 20% reserve / 60% single asset / 30% aggressive / 10% daily reallocation
+- [x] AI explanation: MARA is advisory and cannot sign or send transactions
+- [x] Security model and Phase 11 adversarial review
+- [x] Test evidence: 402 TypeScript tests; 67 Foundry tests across 7 suites
+- [x] Demo flow: `docs/DEMO_GUIDE.md`
+- [x] Sandbox disclosure: sTRSY, sXAU, and sAAPLx confer no backing, redemption, collateral, or ownership rights
+- [x] Known limitations: no autonomous/trading execution, real redemption, live yield, price prediction, or pooled custody
+
+## NEEDS URL
+
+- [ ] GitHub: `TBD — public repository URL required`
+- [ ] Live application: `TBD — deployed application URL required`
+
+## NEEDS SCREENSHOT
+
+- [ ] Final product overview/dashboard
+- [ ] Live vault balances and 40/30/20/10 allocation
+- [ ] Risk and Financial Constitution compliance
+- [ ] MARA advisory output
+- [ ] Builder Code / ERC-8021 explorer evidence, if useful beyond reproducible links
+
+## NEEDS VIDEO
+
+- [ ] Demo video: `TBD — demo-video URL required`
+- [ ] Rehearse and record against `docs/DEMO_GUIDE.md`
+
+## NEEDS TEAM INFO
+
+- [ ] Team: `TBD — authoritative team information required`
+
+## Final manual submission
+
+- [ ] Confirm all external links are public and open in a signed-out browser.
+- [ ] Confirm screenshots and video show no secret-bearing terminal, environment file, or wallet credential.
+- [ ] Confirm submission copy retains testnet, sandbox, demo/non-live, and non-autonomous disclosures.
+- [ ] Submit only after explicit human review.
+- [ ] Record final submission confirmation without inventing evidence.

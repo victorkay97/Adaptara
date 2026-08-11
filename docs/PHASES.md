@@ -11,22 +11,13 @@
 9. **Phase 9 — Yield & Compounding (complete)**
 10. **Phase 10 — Full Product UX & Demo Experience (complete)**
 11. **Phase 11 — Security & Adversarial Testing (complete)**
-12. **Phase 12 — X Layer Deployment & Submission (current — deployment preparation)**
-13. Phase 13 — Demo Rehearsal
-
-Phases 1–11 are complete. Phase 12A deployment preparation is currently in scope; no testnet deployment has occurred.
+12. **Phase 12 — X Layer Deployment & Submission (current)**
+    - Phase 12A — deployment preparation (complete)
+    - Phase 12B — deployment, vault configuration, and seeding record (complete)
+    - Phase 12C — live application integration, Constitution activation, Builder Code, attribution, and acceptance (complete)
+    - Phase 12D — submission packaging (in progress)
+13. **Phase 13 — Demo Rehearsal (pending)**
 
 # Current phase status
 
-- Phase 1 — Complete
-- Phase 2 — Complete
-- Phase 3 — Complete
-- Phase 4 — Complete
-- Phase 5 — Complete
-- Phase 6 — Complete
-- Phase 7 — Complete
-- Phase 8 — Complete
-- Phase 9 — Complete
-- Phase 10 — Complete
-- Phase 11 — Complete
-- Phase 12 — Current — deployment preparation
+Phases 1–11 are complete. The X Layer Testnet deployment and Phase 12C integration are complete and recorded in `deployments/xlayer-testnet.json` and `docs/XLAYER_TESTNET_DEPLOYMENT.md`. Phase 12D submission packaging is currently in progress. Phase 13 has not begun.
