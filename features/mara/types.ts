@@ -15,4 +15,25 @@ export interface MaraModelInput { context: MaraContext; question: string | null 
 export interface MaraModelClient { analyze(input: MaraModelInput): Promise<unknown> }
 
 export type MaraFailureCode = "invalid-request" | "incomplete-context" | "not-configured" | "provider-failure" | "invalid-model-output";
-export class MaraError extends Error { constructor(public readonly code: MaraFailureCode, message: string) { super(message); this.name = "MaraError"; } }
+export type MaraDiagnosticCode =
+  | "openai_request_failure"
+  | "response_not_completed"
+  | "output_text_missing"
+  | "output_json_parse"
+  | "output_schema_validation"
+  | "unknown_evidence"
+  | "unsupported_asset_reference"
+  | "asset_evidence_mismatch"
+  | "invalid_factor_reference"
+  | "factor_evidence_mismatch"
+  | "unsafe_numeric_claim"
+  | "canonical_quantity_claim"
+  | "return_multiplier_claim"
+  | "non_live_claim_violation";
+export interface MaraProviderMetadata { providerErrorName: string; providerStatus?: number; providerCode?: string; providerType?: string; providerRequestId?: string }
+export class MaraError extends Error {
+  constructor(public readonly code: MaraFailureCode, message: string, public readonly diagnosticCode?: MaraDiagnosticCode, public readonly providerMetadata?: MaraProviderMetadata) {
+    super(message);
+    this.name = "MaraError";
+  }
+}

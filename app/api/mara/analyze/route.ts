@@ -7,6 +7,13 @@ import { validateCompleteMaraContext } from "@/features/mara/grounding";
 
 const MAX_BODY_BYTES = 65_536;
 
+function logMaraDiagnostic(error: unknown, publicCode: string): void {
+  const diagnostic = error instanceof MaraError
+    ? { publicCode, ...(error.diagnosticCode ? { diagnosticCode: error.diagnosticCode } : {}), ...error.providerMetadata }
+    : { publicCode, diagnosticCode: "openai_request_failure", errorName: error instanceof Error ? error.name : "UnknownError" };
+  console.error("[MARA_DIAGNOSTIC]", diagnostic);
+}
+
 async function readBoundedBody(request: Request): Promise<string | null> {
   if (!request.body) return "";
   const reader = request.body.getReader();
@@ -45,6 +52,7 @@ export async function POST(request: Request) {
     const code = error instanceof MaraError ? error.code : "provider-failure";
     const status = code === "incomplete-context" ? 422 : code === "not-configured" ? 503 : 502;
     const message = code === "not-configured" ? "MARA is not configured." : code === "incomplete-context" ? "MARA requires complete deterministic data." : "MARA analysis is temporarily unavailable.";
+    if (status === 502) logMaraDiagnostic(error, code);
     return NextResponse.json({ error: message, code }, { status });
   }
 }
