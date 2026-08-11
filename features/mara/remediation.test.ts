@@ -68,6 +68,14 @@ describe("MARA remediation boundaries", () => {
     expect(MARA_INSTRUCTIONS).toMatch(/allocation.+does not satisfy that exact factor evidence requirement/);
     expect(MARA_INSTRUCTIONS).toMatch(/facts do not contain the required exact factor evidence, omit the factor-specific observation/);
   });
+  it("states action-specific exposure semantics without granting amount or destination authority", () => {
+    expect(MARA_INSTRUCTIONS).toContain('For action "reduce_exposure", assetId must identify the supplied portfolio exposure to reduce.');
+    expect(MARA_INSTRUCTIONS).toContain('For action "diversify", assetId must identify the supplied portfolio exposure to diversify away from.');
+    expect(MARA_INSTRUCTIONS).toContain("Do not emit either action with assetId null.");
+    expect(MARA_INSTRUCTIONS).toContain('use "review" or "maintain" instead');
+    expect(MARA_INSTRUCTIONS).toContain("Adaptara, not MARA, chooses BPS and receiver assets.");
+    expect(MARA_INSTRUCTIONS).toContain("Do not suggest allocation amounts or transaction routes.");
+  });
   it.each(["Live data supports this.", "These are live prices.", "This is live price data.", "This is live risk.", "This is live risk data.", "These are live signals."])("rejects additional live-data wording: %s", (summary) => expect(() => validateMaraOutput({ ...valid, summary }, context())).toThrow());
   it.each([
     ["schema", { ...valid, status: "limited" }, "output_schema_validation"],
@@ -75,6 +83,7 @@ describe("MARA remediation boundaries", () => {
     ["unsupported asset", { ...valid, observations: [{ ...valid.observations[0], assetId: "strsy", factorId: null, evidenceRefs: ["asset.saaplx.current-tier"] }] }, "unsupported_asset_reference"],
     ["asset evidence", { ...valid, observations: [{ ...valid.observations[0], factorId: null, evidenceRefs: ["portfolio.risk.score"] }] }, "asset_evidence_mismatch"],
     ["factor evidence", { ...valid, observations: [{ ...valid.observations[0], evidenceRefs: ["asset.saaplx.current-tier"] }] }, "factor_evidence_mismatch"],
+    ["action asset", { ...valid, proposals: [{ action: "diversify", assetId: null, rationale: "Consider a review of supplied exposure.", evidenceRefs: ["portfolio.risk.score"], executionAuthority: "none" }] }, "action_asset_required"],
     ["numeric claim", { ...valid, summary: "Allocation is 47%." }, "unsafe_numeric_claim"],
     ["canonical quantity", { ...valid, summary: "Hold 3 sAAPLx." }, "canonical_quantity_claim"],
     ["return multiplier", { ...valid, summary: "The position may return 2x." }, "return_multiplier_claim"],
@@ -137,6 +146,21 @@ describe("MARA remediation boundaries", () => {
 
   it("requires exact factor evidence in the trusted correction", () => {
     expect(MARA_REMEDIATION_INSTRUCTIONS.factor_evidence_mismatch).toContain("asset.<assetId>.risk.<factorId>");
+  });
+
+  it("remediates action_asset_required with one server-owned correction", async () => {
+    const invalid = { ...valid, proposals: [{ action: "diversify", assetId: null, rationale: "Consider diversification.", evidenceRefs: ["portfolio.risk.score"], executionAuthority: "none" }] };
+    const analyze = vi.fn().mockResolvedValueOnce(invalid).mockResolvedValueOnce(valid);
+    await expect(analyzeWithMara(context(), null, { analyze })).resolves.toEqual(valid);
+    expect(analyze).toHaveBeenCalledTimes(2);
+    expect(analyze.mock.calls[1][0]).toMatchObject({ remediationInstruction: MARA_REMEDIATION_INSTRUCTIONS.action_asset_required });
+  });
+
+  it("fails closed after two action_asset_required results", async () => {
+    const invalid = { ...valid, proposals: [{ action: "reduce_exposure", assetId: null, rationale: "Consider reducing exposure.", evidenceRefs: ["portfolio.risk.score"], executionAuthority: "none" }] };
+    const analyze = vi.fn().mockResolvedValue(invalid);
+    await expect(analyzeWithMara(context(), null, { analyze })).rejects.toMatchObject({ code: "invalid-model-output", diagnosticCode: "action_asset_required" });
+    expect(analyze).toHaveBeenCalledTimes(2);
   });
 
   it("validates the second output with the unchanged deterministic validator", async () => {

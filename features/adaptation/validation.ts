@@ -11,6 +11,7 @@ import { RISK_FACTOR_IDS } from "@/features/risk/types";
 import { MARA_ACTIONS } from "@/features/mara/types";
 import { evaluateTargetAllocationCompliance } from "./target-compliance";
 import { MAX_ADAPTATION_STEP_BPS, type AdaptationInput, type AdaptationPlan } from "./types";
+import { selectAdaptationPair } from "./selection";
 
 const catalogById = new Map(ASSET_CATALOG.map((asset) => [asset.id, asset]));
 const actionable = new Set(["increase_reserve", "reduce_exposure", "diversify"]);
@@ -141,6 +142,12 @@ export function validateAdaptationPlan(plan: AdaptationPlan, input: AdaptationIn
       const firstIndex = input.maraAnalysis.proposals.findIndex((proposal) => actionable.has(proposal.action));
       const proposal = input.maraAnalysis.proposals[firstIndex];
       if (!proposal || plan.selectedProposalIndex !== firstIndex || plan.selectedAction !== proposal.action || plan.selectedAssetId !== proposal.assetId || exactJson(plan.maraEvidenceRefs) !== exactJson(proposal.evidenceRefs)) errors.push("Selected MARA proposal provenance is invalid.");
+      if (proposal) {
+        const eligiblePositions = planningEligible(input.snapshot);
+        const meaningfulPositions = eligiblePositions.filter((position) => position.rawBalance! > 0n && position.allocationBps! > 0);
+        const expectedPair = selectAdaptationPair(proposal, eligiblePositions, meaningfulPositions, input.constitution.constitution, expectedStep);
+        if (!expectedPair || donors[0]?.assetId !== expectedPair.donor.asset.id || receivers[0]?.assetId !== expectedPair.receiver.asset.id || plan.reallocationBps !== expectedPair.amountBps) errors.push("Plan movement does not match the deterministic action, donor, receiver, or capacity policy.");
+      }
       const compliance = evaluateTargetAllocationCompliance(plan.allocations, ASSET_CATALOG, input.constitution.constitution);
       if (compliance.status !== "compliant") errors.push("Target allocation is not constitution-compliant.");
       if (exactJson(plan.postPlanCompliance) !== exactJson(compliance)) errors.push("Recorded post-plan compliance does not match independent target evaluation.");

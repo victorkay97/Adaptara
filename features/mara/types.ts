@@ -26,6 +26,7 @@ export type MaraDiagnosticCode =
   | "asset_evidence_mismatch"
   | "invalid_factor_reference"
   | "factor_evidence_mismatch"
+  | "action_asset_required"
   | "unsafe_numeric_claim"
   | "canonical_quantity_claim"
   | "return_multiplier_claim"

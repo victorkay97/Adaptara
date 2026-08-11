@@ -11,6 +11,7 @@ export const MARA_REMEDIATION_INSTRUCTIONS = {
   asset_evidence_mismatch: "Regenerate so every item with an assetId cites at least one exact supplied evidence ID beginning asset.<assetId>.",
   invalid_factor_reference: "Regenerate using only literal factor IDs represented by the supplied Adaptara grounding facts.",
   factor_evidence_mismatch: "Regenerate the structured answer. For every observation with a factorId, set assetId and include the exact supplied evidence ID asset.<assetId>.risk.<factorId>. If that exact supplied fact is absent, omit the factor-specific observation.",
+  action_asset_required: "Regenerate the structured answer. For reduce_exposure or diversify, assetId must identify the exact supplied portfolio exposure to reduce or diversify away from. If supplied evidence does not support a specific asset, use review or maintain instead.",
   unsafe_numeric_claim: "Regenerate without quoting financial amounts, percentages, scores, BPS values, or similar prohibited numeric financial claims in prose.",
   canonical_quantity_claim: "Regenerate without quoting canonical token quantities in prose.",
   return_multiplier_claim: "Regenerate without quoting return multipliers in prose.",

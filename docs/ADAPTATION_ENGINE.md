@@ -13,14 +13,16 @@ Only the first allocation-changing MARA proposal is considered. `maintain` and `
 The application safety throttle is `MAX_ADAPTATION_STEP_BPS = 500`. The step budget is the smaller of 500 BPS and `maximumDailyReallocationBps`. This constrains each Phase 7 plan only. Cumulative daily execution accounting does not exist because Phase 7 performs no execution.
 
 - `increase_reserve`: Reserve receivers use lowest allocation then catalog order; non-Reserve donors use highest allocation then catalog order.
-- `reduce_exposure`: the meaningful referenced asset is the donor. Receivers prefer Reserve, other non-Aggressive, then baseline-Aggressive, using lowest allocation then catalog order.
-- `diversify`: a meaningful referenced asset is the donor, otherwise the largest meaningful holding is selected. The lowest-allocation eligible different asset is the receiver. Catalog order resolves ties.
+- `reduce_exposure`: `proposal.assetId` is required and identifies the meaningful exposure to reduce. That asset is the donor. Receivers prefer Reserve, other non-Aggressive, then baseline-Aggressive, using lowest allocation then catalog order.
+- `diversify`: `proposal.assetId` is required and identifies the meaningful exposure to diversify away from. That asset is the donor. Eligible non-Aggressive receivers are tried before baseline-Aggressive receivers; within each group, lower allocation then catalog order determines preference.
+
+An under-specified `reduce_exposure` or `diversify` proposal with a null asset target fails closed without producing a transfer pair. The engine never infers a donor from MARA prose or observations. MARA chooses only the directional action and targeted exposure; Adaptara chooses the receiver and exact bounded BPS deterministically.
 
 Candidates must be canonical, configured/readable, have known balances and usable reference-price state. Known-zero configured positions may receive allocation; unknown balances are never zero. Capacity is capped by donor allocation, receiver single-asset headroom, aggregate Reserve minimum, aggregate baseline-Aggressive maximum, and the step budget. Classification always uses catalog `baselineRiskTier`.
 
 ## Validation and provenance
 
-The independent validator checks integer BPS, the exact authoritative asset map and current allocations, current and target totals of 10,000, nonnegative targets, delta coherence, one meaningful donor and one eligible receiver, balanced movement, independently derived safety limits and MARA provenance, and post-plan constitution compliance. Target compliance is evaluated directly from target BPS and canonical catalog tiers; Phase 7 never fabricates a future portfolio snapshot, balance, value, or price. Reallocation is the sum of positive deltas, not both transfer sides.
+The independent validator checks integer BPS, the exact authoritative asset map and current allocations, current and target totals of 10,000, nonnegative targets, delta coherence, one meaningful donor and one eligible receiver, balanced movement, independently recomputed action-specific donor/receiver selection and capacity, safety limits, MARA provenance, and post-plan constitution compliance. Target compliance is evaluated directly from target BPS and canonical catalog tiers and remains the final policy gate; Phase 7 never fabricates a future portfolio snapshot, balance, value, or price. Reallocation is the sum of positive deltas, not both transfer sides.
 
 Plans preserve vault, chain, portfolio block, constitution block, selected MARA proposal/action/asset, evidence references, and constitution limits. Portfolio and constitution reads are not called same-block unless they are. Portfolio, MARA, risk, vault/account, or constitution provenance changes clear visible advice or plans.
 

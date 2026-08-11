@@ -17,6 +17,7 @@ export function validateMaraOutput(value: unknown, context: MaraContext): MaraAn
   if (!parsed.success) throw new MaraError("invalid-model-output", "MARA returned an invalid structured response.", "output_schema_validation");
   const evidence = new Set(context.facts.map((fact) => fact.id));
   const meaningfulAssets = new Set(context.facts.filter((fact) => fact.id.endsWith(".symbol")).map((fact) => fact.id.split(".")[1]));
+  if (parsed.data.proposals.some((proposal) => (proposal.action === "reduce_exposure" || proposal.action === "diversify") && proposal.assetId === null)) throw new MaraError("invalid-model-output", "MARA actionable exposure reduction requires a specific asset.", "action_asset_required");
   for (const item of [...parsed.data.observations, ...parsed.data.proposals]) {
     if (item.evidenceRefs.some((ref) => !evidence.has(ref))) throw new MaraError("invalid-model-output", "MARA cited unknown evidence.", "unknown_evidence");
     if (item.assetId && (!ASSET_IDS.includes(item.assetId) || !meaningfulAssets.has(item.assetId))) throw new MaraError("invalid-model-output", "MARA referenced an unknown portfolio asset.", "unsupported_asset_reference");

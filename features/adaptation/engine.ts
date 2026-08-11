@@ -1,15 +1,10 @@
 import { ASSET_CATALOG } from "@/features/portfolio/catalog";
-import type { AssetPosition } from "@/features/portfolio/types";
-import type { MaraProposal } from "@/features/mara/types";
 import { ADAPTATION_VERSION, MAX_ADAPTATION_STEP_BPS, type AdaptationAllocation, type AdaptationInput, type AdaptationPlan } from "./types";
 import { evaluateTargetAllocationCompliance } from "./target-compliance";
 import { planningEligible, validateAdaptationInput, validateAdaptationPlan } from "./validation";
+import { selectAdaptationPair } from "./selection";
 
 const ACTIONABLE = new Set(["increase_reserve", "reduce_exposure", "diversify"]);
-const catalogOrder = new Map(ASSET_CATALOG.map((asset, index) => [asset.id, index]));
-const canonical = (a: AssetPosition, b: AssetPosition) => catalogOrder.get(a.asset.id)! - catalogOrder.get(b.asset.id)!;
-const byLowest = (a: AssetPosition, b: AssetPosition) => a.allocationBps! - b.allocationBps! || canonical(a, b);
-const byHighest = (a: AssetPosition, b: AssetPosition) => b.allocationBps! - a.allocationBps! || canonical(a, b);
 const standardNotes = [
   "Simulation · not executed.",
   "Phase 7 limits each generated plan to the constitution's daily reallocation ceiling. Cumulative daily execution accounting is not implemented because Phase 7 performs no execution.",
@@ -30,37 +25,6 @@ function base(input: AdaptationInput): AdaptationPlan {
   };
 }
 
-function transferCapacity(donor: AssetPosition, receiver: AssetPosition, input: AdaptationInput, step: number): number {
-  if (input.constitution.source !== "onchain") return 0;
-  const policy = input.constitution.constitution;
-  const eligible = planningEligible(input.snapshot);
-  const reserve = eligible.filter((position) => position.asset.baselineRiskTier === "Reserve").reduce((sum, position) => sum + position.allocationBps!, 0);
-  const aggressive = eligible.filter((position) => position.asset.baselineRiskTier === "Aggressive").reduce((sum, position) => sum + position.allocationBps!, 0);
-  let capacity = Math.min(step, donor.allocationBps!, policy.maximumSingleAssetExposureBps - receiver.allocationBps!);
-  if (donor.asset.baselineRiskTier === "Reserve" && receiver.asset.baselineRiskTier !== "Reserve") capacity = Math.min(capacity, reserve - policy.minimumReserveBps);
-  if (receiver.asset.baselineRiskTier === "Aggressive" && donor.asset.baselineRiskTier !== "Aggressive") capacity = Math.min(capacity, policy.maximumAggressiveExposureBps - aggressive);
-  return Math.max(0, capacity);
-}
-
-function candidatePairs(proposal: MaraProposal, eligible: AssetPosition[], meaningful: AssetPosition[]): Array<[AssetPosition, AssetPosition]> {
-  if (proposal.action === "increase_reserve") {
-    const donors = meaningful.filter((position) => position.asset.baselineRiskTier !== "Reserve").sort(byHighest);
-    const receivers = eligible.filter((position) => position.asset.baselineRiskTier === "Reserve").sort(byLowest);
-    return donors.flatMap((donor) => receivers.map((receiver) => [donor, receiver] as [AssetPosition, AssetPosition]));
-  }
-  if (proposal.action === "reduce_exposure") {
-    const donor = meaningful.find((position) => position.asset.id === proposal.assetId);
-    if (!donor) return [];
-    const group = (position: AssetPosition) => position.asset.baselineRiskTier === "Reserve" ? 0 : position.asset.baselineRiskTier === "Aggressive" ? 2 : 1;
-    return eligible.filter((position) => position.asset.id !== donor.asset.id).sort((a, b) => group(a) - group(b) || byLowest(a, b)).map((receiver) => [donor, receiver]);
-  }
-  if (proposal.action === "diversify") {
-    const donor = proposal.assetId ? meaningful.find((position) => position.asset.id === proposal.assetId) : [...meaningful].sort(byHighest)[0];
-    return donor ? eligible.filter((position) => position.asset.id !== donor.asset.id).sort(byLowest).map((receiver) => [donor, receiver]) : [];
-  }
-  return [];
-}
-
 export function createAdaptationPlan(input: AdaptationInput): AdaptationPlan {
   const plan = base(input);
   const inputBlockers = validateAdaptationInput(input);
@@ -70,18 +34,15 @@ export function createAdaptationPlan(input: AdaptationInput): AdaptationPlan {
   const proposal = input.maraAnalysis.proposals[selectedProposalIndex];
   Object.assign(plan, { selectedProposalIndex, selectedAction: proposal.action, selectedAssetId: proposal.assetId, maraEvidenceRefs: [...proposal.evidenceRefs] });
   if (plan.stepBudgetBps === 0) return { ...plan, blockers: ["Active constitution permits no reallocation."] };
+  if ((proposal.action === "reduce_exposure" || proposal.action === "diversify") && proposal.assetId === null) return { ...plan, status: "no-action", notes: ["The selected MARA direction did not identify a specific exposure to reduce, so no allocation change is proposed.", ...standardNotes] };
   const eligible = planningEligible(input.snapshot);
   const meaningful = eligible.filter((position) => position.rawBalance! > 0n && position.allocationBps! > 0);
   if ((proposal.action === "reduce_exposure" || (proposal.action === "diversify" && proposal.assetId)) && !meaningful.some((position) => position.asset.id === proposal.assetId)) {
     return { ...plan, status: "no-action", notes: ["The MARA-referenced asset is not a meaningful current vault holding, so no allocation change is proposed.", ...standardNotes] };
   }
-  let selected: [AssetPosition, AssetPosition, number] | null = null;
-  for (const [donor, receiver] of candidatePairs(proposal, eligible, meaningful)) {
-    const amount = transferCapacity(donor, receiver, input, plan.stepBudgetBps);
-    if (amount >= 1) { selected = [donor, receiver, amount]; break; }
-  }
+  const selected = input.constitution.source === "onchain" ? selectAdaptationPair(proposal, eligible, meaningful, input.constitution.constitution, plan.stepBudgetBps) : null;
   if (!selected) return { ...plan, blockers: [proposal.action === "increase_reserve" ? "No eligible Reserve destination has available capacity." : "No eligible donor and destination pair permits a constitution-compliant transfer."] };
-  const [donor, receiver, amount] = selected;
+  const { donor, receiver, amountBps: amount } = selected;
   const allocations: AdaptationAllocation[] = plan.allocations.map((item) => {
     const deltaBps = item.assetId === donor.asset.id ? -amount : item.assetId === receiver.asset.id ? amount : 0;
     return { ...item, targetAllocationBps: item.currentAllocationBps + deltaBps, deltaBps };
