@@ -56,6 +56,12 @@ The zero-value proof transaction `0x7fdfecc0b989992c33e4e586f56a508bae2c0d5f4b70
 
 The receipt contains exactly one vault `PolicyUpdated(uint16,uint16,uint16,uint16)` event carrying 2,000/6,000/3,000/1,000 BPS. Fresh reads confirm the effective policy is unchanged, the owner and guardian remain the demo owner, the vault remains unpaused with zero agent executor and the same AssetRegistry, and raw vault balances remain USD₮0 `8000000`, sTRSY `60000000000000000`, sXAU `2000000000000000`, and sAAPLx `10000000000000000`. The current OKLink transaction page independently displays Builder Code `tl5ce7n7gk5a5pzk`, confirming external attribution indexing in addition to the mined-input protocol proof.
 
+## Phase 12C5 final browser/onchain acceptance
+
+Final read-only reconciliation on X Layer Testnet, chain ID `1952`, confirms the demo owner `0x7bc8489c39A750CCFa6C06d5d6dB5F682976234E`, its factory-discovered vault `0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4`, and nonce `21`. The vault remains unpaused with zero agent executor and active Constitution 2,000/6,000/3,000/1,000 BPS. Its exact balances remain 8 USD₮0, 0.06 sTRSY, 0.002 sXAU, and 0.01 sAAPLx, representing the explicitly demo/non-live $20 reference portfolio and 40/30/20/10 allocation; the portfolio remains compliant with the 20% reserve minimum, 60% single-asset maximum, and 30% baseline-Aggressive maximum.
+
+The production browser application is configured for the authoritative X Layer addresses and registered Builder Code `tl5ce7n7gk5a5pzk`, registered by `0x62d2c221dc73a44502e78529d5add9ad4cca51329377beab6064d51d041b61ef`. The C4C2 browser inspection established the real wallet request path, and mined proof transaction `0x7fdfecc0b989992c33e4e586f56a508bae2c0d5f4b70e650960267e54e56493e` plus current OKLink indexing establish attribution. Final production, source, test, and RPC acceptance confirm authoritative reads and safe empty/error states without another wallet request. Sandbox/no-redemption and demo/non-live disclosures remain present; MARA and Sentinel remain advisory without signing authority, Adaptation remains deterministic recommendation logic, and Yield remains a non-live simulation. No signature or transaction occurred during Phase 12C5.
+
 ## A. Prerequisites
 
 - Baseline: commit `c32ec6521e90509849ea61883bbde120ac114bf8`, branch `phase-12-xlayer-deployment-submission`.
