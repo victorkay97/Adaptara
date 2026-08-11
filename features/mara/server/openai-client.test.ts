@@ -11,6 +11,17 @@ const input = { context: {}, question: null } as MaraModelInput;
 const clientWith = (create: ReturnType<typeof vi.fn>) => new OpenAIMaraClient({ responses: { create } } as unknown as Pick<OpenAI, "responses">, "gpt-5.6");
 
 describe("OpenAI MARA diagnostics", () => {
+  it("keeps remediation in trusted instructions and out of user input", async () => {
+    const create = vi.fn().mockResolvedValue({ status: "completed", output_text: "{}" });
+    const remediationInstruction = "Use exact supplied evidence IDs.";
+    await clientWith(create).analyze({ ...input, remediationInstruction });
+    const request = create.mock.calls[0][0];
+    expect(request.instructions).toContain(`Server-owned remediation instruction: ${remediationInstruction}`);
+    expect(JSON.stringify(request.input)).not.toContain(remediationInstruction);
+    expect(request).toMatchObject({ model: "gpt-5.6", reasoning: { effort: "low" }, store: false, max_output_tokens: 1800, text: { format: { type: "json_schema", name: "mara_analysis", strict: true } } });
+    expect(request.tools).toBeUndefined();
+  });
+
   it("preserves only documented safe APIError metadata", async () => {
     const headers = new Headers({ "x-request-id": "req_safe", authorization: "Bearer secret" });
     const providerError = new APIError(429, { code: "rate_limit", type: "rate_limit_error", message: "provider detail must not propagate" }, "unsafe provider message", headers);

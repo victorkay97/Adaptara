@@ -21,7 +21,10 @@ export class OpenAIMaraClient implements MaraModelClient {
   async analyze(input: MaraModelInput): Promise<unknown> {
     let response;
     try {
-      response = await this.client.responses.create({ model: this.model, instructions: MARA_INSTRUCTIONS, input: [{ role: "user", content: buildMaraModelInput(input.context, input.question) }], reasoning: { effort: "low" }, store: false, max_output_tokens: 1800, text: { format: { type: "json_schema", name: "mara_analysis", strict: true, schema: MARA_JSON_SCHEMA } } });
+      const instructions = input.remediationInstruction
+        ? `${MARA_INSTRUCTIONS}\n\nServer-owned remediation instruction: ${input.remediationInstruction}`
+        : MARA_INSTRUCTIONS;
+      response = await this.client.responses.create({ model: this.model, instructions, input: [{ role: "user", content: buildMaraModelInput(input.context, input.question) }], reasoning: { effort: "low" }, store: false, max_output_tokens: 1800, text: { format: { type: "json_schema", name: "mara_analysis", strict: true, schema: MARA_JSON_SCHEMA } } });
     } catch (error) { throw new MaraError("provider-failure", "MARA provider request failed.", "openai_request_failure", safeProviderMetadata(error)); }
     if (response.status !== "completed") throw new MaraError("provider-failure", "MARA provider did not complete a structured response.", "response_not_completed");
     if (!response.output_text) throw new MaraError("provider-failure", "MARA provider did not return structured output text.", "output_text_missing");

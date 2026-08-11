@@ -11,7 +11,7 @@ export interface MaraContext { contextVersion: "phase-5.v1"; portfolioSource: Po
 export interface MaraObservation { type: "portfolio" | "risk" | "concentration" | "asset" | "uncertainty"; assetId: AssetId | null; factorId: RiskFactorId | null; importance: "low" | "medium" | "high"; text: string; evidenceRefs: string[] }
 export interface MaraProposal { action: MaraAction; assetId: AssetId | null; rationale: string; evidenceRefs: string[]; executionAuthority: "none" }
 export interface MaraAnalysis { status: MaraStatus; summary: string; observations: MaraObservation[]; proposals: MaraProposal[]; uncertainties: string[] }
-export interface MaraModelInput { context: MaraContext; question: string | null }
+export interface MaraModelInput { context: MaraContext; question: string | null; remediationInstruction?: string }
 export interface MaraModelClient { analyze(input: MaraModelInput): Promise<unknown> }
 
 export type MaraFailureCode = "invalid-request" | "incomplete-context" | "not-configured" | "provider-failure" | "invalid-model-output";
