@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { parsePublicEnv } from "./public";
+import { parsePublicEnv, PRODUCTION_ADAPTARA_FACTORY_V2_ADDRESS, resolvePublicAppUrl } from "./public";
 
 describe("public environment validation", () => {
   it("provides safe development defaults", () => {
@@ -9,6 +9,24 @@ describe("public environment validation", () => {
   it("rejects the wrong chain and malformed addresses", () => {
     expect(() => parsePublicEnv({ NEXT_PUBLIC_XLAYER_CHAIN_ID: "1" })).toThrow("1952");
     expect(() => parsePublicEnv({ NEXT_PUBLIC_TEST_USDT0_ADDRESS: "invalid" })).toThrow("valid EVM address");
+  });
+
+  it("requires an explicit mode-consistent mainnet configuration", () => {
+    const live = parsePublicEnv({ NEXT_PUBLIC_XLAYER_NETWORK_MODE: "live-read-only" });
+    expect(live).toMatchObject({ NEXT_PUBLIC_XLAYER_CHAIN_ID: 196, NEXT_PUBLIC_XLAYER_RPC_URL: "https://rpc.xlayer.tech", NEXT_PUBLIC_ADAPTARA_FACTORY_V2_ADDRESS: PRODUCTION_ADAPTARA_FACTORY_V2_ADDRESS });
+    expect(() => parsePublicEnv({ NEXT_PUBLIC_XLAYER_NETWORK_MODE: "live-read-only", NEXT_PUBLIC_XLAYER_CHAIN_ID: "1952" })).toThrow("requires X Layer chain ID 196");
+    expect(() => parsePublicEnv({ NEXT_PUBLIC_XLAYER_NETWORK_MODE: "demo", NEXT_PUBLIC_XLAYER_CHAIN_ID: "196" })).toThrow("requires X Layer chain ID 1952");
+  });
+
+  it("rejects malformed V2 configuration and never injects production V2 into demo mode", () => {
+    expect(parsePublicEnv({}).NEXT_PUBLIC_ADAPTARA_FACTORY_V2_ADDRESS).toBeUndefined();
+    expect(() => parsePublicEnv({ NEXT_PUBLIC_ADAPTARA_FACTORY_V2_ADDRESS: "invalid" })).toThrow("valid EVM address");
+  });
+
+  it("uses the exact Vercel HTTPS deployment origin only when no app URL is configured", () => {
+    expect(resolvePublicAppUrl(undefined, "adaptara-preview.vercel.app")).toBe("https://adaptara-preview.vercel.app");
+    expect(resolvePublicAppUrl("https://adaptara.example", "ignored.vercel.app")).toBe("https://adaptara.example");
+    expect(resolvePublicAppUrl()).toBeUndefined();
   });
 
   it("rejects a noncanonical test USD₮0 address", () => {

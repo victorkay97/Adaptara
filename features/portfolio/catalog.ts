@@ -19,3 +19,8 @@ export const ASSET_CATALOG = createAssetCatalog({
   sxau: optionalAddress(publicEnv.NEXT_PUBLIC_SXAU_ADDRESS),
   saaplx: optionalAddress(publicEnv.NEXT_PUBLIC_SAAPLX_ADDRESS),
 });
+
+export const MAINNET_ASSET_CATALOG: readonly AssetMetadata[] = [
+  { id: "usdt", symbol: "USDT", displayName: "Tether USD", role: "Reserve", baselineRiskTier: "Reserve", expectedDecimals: 6, sandbox: false, address: getAddress("0x779Ded0c9e1022225f8E0630b35a9b54bE713736") },
+  { id: "xeth", symbol: "xETH", displayName: "X Layer Ether", role: "Native ecosystem exposure", baselineRiskTier: "Balanced", expectedDecimals: 18, sandbox: false, address: getAddress("0xE7B000003A45145decf8a28FC755aD5eC5EA025A") },
+];

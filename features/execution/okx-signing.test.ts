@@ -1,0 +1,2 @@
+import { createHmac } from "node:crypto"; import { describe,expect,it } from "vitest"; import { signOkxRequest } from "./okx-signing";
+describe("OKX signing",()=>{it("uses official timestamp+method+path/query+body HMAC-SHA256 base64 prehash",()=>{const input={timestamp:"2026-08-12T00:00:00.000Z",method:"GET" as const,pathWithQuery:"/api/v6/dex/aggregator/swap?chainIndex=196&amount=1",secret:"fixture-secret"}; expect(signOkxRequest(input)).toBe(createHmac("sha256",input.secret).update(input.timestamp+input.method+input.pathWithQuery).digest("base64"))})});

@@ -10,11 +10,20 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "preflight:xlayer": "node scripts/preflight-xlayer.mjs",
+    "predeploy:adaptara": "node scripts/predeploy-adaptara.mjs",
     "test:contracts": "forge test --root contracts",
     "check": "npm run lint && npm run typecheck && npm run test && npm run build && npm run test:contracts"
   },
   "dependencies": {
+    "@okxconnect/universal-provider": "1.9.1",
+    "@reown/appkit": "1.8.23",
+    "@reown/appkit-adapter-wagmi": "1.8.23",
+    "@reown/appkit-wallet-button": "1.8.23",
     "@tanstack/react-query": "^5.87.1",
+    "@x402/core": "2.22.0",
+    "@x402/evm": "2.22.0",
+    "@x402/extensions": "2.22.0",
+    "@x402/svm": "2.22.0",
     "next": "16.3.0",
     "openai": "^7.4.0",
     "ox": "^0.14.33",
@@ -36,11 +45,11 @@
     "vitest": "^3.2.4"
   },
   "overrides": {
-  "@coinbase/cdp-sdk@1.55.0": {
-    "axios": "1.18.0"
-  },
-  "viem@2.23.2": {
-    "ws": "8.21.0"
+    "@coinbase/cdp-sdk@1.55.0": {
+      "axios": "1.18.0"
+    },
+    "viem@2.23.2": {
+      "ws": "8.21.0"
+    }
   }
-}
 }

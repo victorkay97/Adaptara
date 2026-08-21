@@ -1,0 +1,2 @@
+import{describe,expect,it}from"vitest";import{classifyVaults}from"./discovery";const a="0x0000000000000000000000000000000000000001" as const,b="0x0000000000000000000000000000000000000002" as const;
+describe("versioned discovery",()=>{it("does not equate legacy and managed",()=>expect(classifyVaults(a)).toEqual({status:"legacy-only",legacy:a}));it("represents both",()=>expect(classifyVaults(a,b).status).toBe("both"));it("represents unavailable",()=>expect(classifyVaults(null,null,"RPC down").status).toBe("unavailable"));});

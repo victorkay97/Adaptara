@@ -5,6 +5,7 @@ import type { PortfolioSnapshot } from "@/features/portfolio/types";
 import type { PortfolioRiskAssessment } from "@/features/risk/types";
 import { buildMaraContext, maraContextFingerprint } from "../context";
 import type { MaraAnalysis, MaraGroundingFact } from "../types";
+import { ObservationAwareness } from "@/features/observation/components/observation-awareness";
 
 const evidenceLabel = (ref: string, facts: MaraGroundingFact[]) => facts.find((fact) => fact.id === ref)?.label ?? "Grounding evidence";
 const ACTION_LABELS = { maintain: "Maintain and monitor", review: "Review exposure", increase_reserve: "Evaluate higher reserves", reduce_exposure: "Evaluate lower exposure", diversify: "Evaluate diversification" } as const;
@@ -25,6 +26,7 @@ export function MaraPanel({ snapshot, assessment, onAnalysisChange }: { snapshot
   // eslint-disable-next-line react-hooks/refs
   contextRef.current = contextKey;
   useEffect(() => { onAnalysisChange?.(null, contextKey); }, [contextKey, onAnalysisChange]);
+  useEffect(() => { const receiveSuggestion = (event: Event) => setQuestion((event as CustomEvent<string>).detail); window.addEventListener("adaptara:mara-question", receiveSuggestion); return () => window.removeEventListener("adaptara:mara-question", receiveSuggestion); }, []);
   const analysis = result?.contextKey === contextKey ? result.analysis : null;
   const state = maraRequestStatusForContext(request, contextKey);
   const complete = snapshot.valuationStatus === "valued" && assessment.status === "assessed";
@@ -43,6 +45,7 @@ export function MaraPanel({ snapshot, assessment, onAnalysisChange }: { snapshot
     } catch { if (maraCompletionForContext(startedContext, contextRef.current, "error")) setRequest({ contextKey: startedContext, status: "error" }); }
   }
   return <section className="mt-6 rounded-2xl border border-[#b9c9e8] bg-[#f5f7fc] p-5" aria-label="MARA">
+    <ObservationAwareness />
     <div><p className="text-xs font-bold uppercase tracking-[0.16em] text-[#405f9b]">MARA</p><h3 className="mt-2 text-xl font-semibold">Market Adaptive Risk Agent</h3><p className="mt-2 text-sm text-[var(--muted)]">AI interpretation of Adaptara&apos;s deterministic portfolio and risk data.</p></div>
     <p className="mt-4 rounded-xl bg-white/80 p-3 text-sm"><strong>AI-generated interpretation — advisory only.</strong> Deterministic portfolio and risk calculations come from Adaptara&apos;s Portfolio and Risk engines.</p>
     {!complete ? <p className="mt-4 text-sm text-amber-900">MARA analysis is unavailable until deterministic portfolio valuation and risk assessment are complete.</p> : <><label className="mt-5 block text-sm font-semibold" htmlFor={`mara-question-${snapshot.source}`}>Optional portfolio question</label><textarea id={`mara-question-${snapshot.source}`} maxLength={1000} value={question} onChange={(event) => setQuestion(event.target.value)} className="mt-2 min-h-24 w-full rounded-xl border border-[var(--line)] bg-white p-3 text-sm" placeholder="What is driving most of my current risk?" /><button type="button" onClick={analyze} disabled={state === "loading"} className="mt-3 rounded-full bg-[#294f3b] px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60">{state === "loading" ? "MARA is analyzing…" : "Analyze with MARA"}</button></>}

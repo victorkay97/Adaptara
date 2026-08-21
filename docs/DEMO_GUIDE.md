@@ -4,10 +4,11 @@ Target length: approximately 3–5 minutes. The times below are guides, not hard
 
 ## Before recording
 
+Production `/demo` is a judge-facing, deterministic simulation with no wallet or signer dependency. It is intentionally separate from `/dev-showcase`, whose internal fixture controls and fake account presentation remain development-only. Live `/dashboard` continues to use wallet-gated onchain reads and never falls back to Demo fixtures.
+
 - [ ] Application is running locally or at the final deployed URL.
-- [ ] X Layer Testnet, chain ID `1952`, is selected.
-- [ ] Demo owner `0x7bc8489c39A750CCFa6C06d5d6dB5F682976234E` is connected.
-- [ ] Factory discovers vault `0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4`.
+- [ ] Demo Mode is selected for the full simulated journey, or Live Mode is connected for read-only production discovery.
+- [ ] If showing historical Testnet evidence, chain `1952`, demo owner `0x7bc8489c39A750CCFa6C06d5d6dB5F682976234E`, and factory-discovered vault `0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4` are identified as the earlier milestone.
 - [ ] Final balances are 8 USD₮0, 0.06 sTRSY, 0.002 sXAU, and 0.01 sAAPLx.
 - [ ] Active Constitution reads 20% / 60% / 30% / 10% and no draft is dirty.
 - [ ] No pending MetaMask request is open.
@@ -26,9 +27,9 @@ Target length: approximately 3–5 minutes. The times below are guides, not hard
 
 ### 0:20–0:45 — Wallet and live X Layer vault
 
-- Show X Layer Testnet and the connected demo owner.
-- Show that the application discovers the owner's vault through the deployed factory rather than using a hardcoded fallback.
-- Point out that balances and decimals are live onchain reads.
+- Show the full, explicitly simulated Demo Mode without requiring a wallet.
+- Contrast Live Mode: real X Layer portfolio and V1/V2 Vault discovery, currently read-only for public users.
+- If showing Testnet, state that it is the initial deployment milestone rather than the current Mainnet architecture.
 
 ### 0:45–1:15 — Portfolio and sandbox RWA allocation
 
@@ -59,7 +60,8 @@ Target length: approximately 3–5 minutes. The times below are guides, not hard
 
 ### 2:50–3:20 — Security model
 
-- Explain one non-upgradeable isolated vault per owner and no pooled custody.
+- Explain independently governed non-upgradeable Vaults and no pooled custody.
+- Mention additive Mainnet Factory V2, its 16-Vault owner cap, and independent per-Vault policy and state.
 - Mention no generic execute, arbitrary call, or `delegatecall` path.
 - Point out owner withdrawals/recovery, pause controls, and role collision protections.
 - Reiterate that AI output is never transaction authority.
@@ -85,7 +87,8 @@ Target length: approximately 3–5 minutes. The times below are guides, not hard
 - Adaptara executes live yield strategies or has earned yield.
 - Demo reference values are live/oracle prices or reliable price predictions.
 - AI controls funds, owns a wallet key, or can bypass the Constitution.
-- The system is deployed on mainnet.
+- Testnet and Mainnet contracts are byte-for-byte identical.
+- Public production writes or Adaptive execution are enabled.
 - Contracts are explorer-verified while their recorded status remains deployed-unverified.
 
 ## Evidence to show
@@ -95,14 +98,14 @@ Target length: approximately 3–5 minutes. The times below are guides, not hard
 - Demo vault: `0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4`
 - AssetRegistry and AdaptiveVaultFactory addresses
 - Active Constitution and exact demo balances
-- 437 passing TypeScript tests across 38 files
-- 67 passing Foundry tests across 7 suites
+- 591 passing frontend tests across 67 files
+- 160 passing Foundry tests across 21 suites
 
 ## Final recording checklist
 
 - [ ] Recording is approximately 3–5 minutes.
 - [ ] Product name, tagline, MARA name, and architecture statement are correct.
-- [ ] X Layer Testnet is visible and no mainnet claim is made.
+- [ ] Demo simulation, historical Testnet evidence, and current Mainnet state are distinguished clearly.
 - [ ] Vault address, balances, allocation, and Constitution match the final record.
 - [ ] Demo/non-live and sandbox disclosures are visible or spoken.
 - [ ] Advisory and simulation features are not presented as autonomous execution.

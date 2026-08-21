@@ -20,6 +20,12 @@ export function YieldPanel({ snapshot }: { snapshot?: PortfolioSnapshot }) {
   const result = projectionForContext(stored, contextKey);
 
   return <section className="mt-6 rounded-2xl border border-[#9db9a8] bg-[#f2f8f4] p-5" aria-label="Yield Intelligence">
+    <aside className="mb-5 rounded-xl border border-[#cbdcd1] bg-white p-4" aria-label="Yield strategy">
+      <p className="text-xs font-bold uppercase tracking-[0.14em] text-[#236a4a]">Yield strategy</p>
+      <h3 className="mt-1 font-semibold">Aave V3 · X Layer</h3>
+      <dl className="mt-3 grid gap-2 text-xs sm:grid-cols-2"><div><dt>Principal supplied</dt><dd>Fork proof only</dd></div><div><dt>Accrued protocol yield</dt><dd>Onchain aToken balance</dd></div><div><dt>Policy</dt><dd>Compound / liquid reserve</dd></div><div><dt>Status</dt><dd>Public execution disabled</dd></div></dl>
+      <p className="mt-3 text-xs text-[var(--muted)]">Supply rates can change and protocol yield is not guaranteed. No live supply control is enabled.</p>
+    </aside>
     <p className="text-xs font-bold uppercase tracking-[0.16em] text-[#236a4a]">Yield Intelligence</p>
     <div className="mt-2 flex flex-wrap items-center justify-between gap-3"><h3 className="text-xl font-semibold">Compounding Simulation</h3><span className="rounded-full border border-amber-300 bg-amber-50 px-3 py-1 text-xs font-bold text-amber-900">Sandbox yield model · non-live</span></div>
     <p className="mt-2 text-sm text-[var(--muted)]">Explore deterministic yield and compounding scenarios using transparent demo terms. No yield is earned or claimed by this simulation.</p>

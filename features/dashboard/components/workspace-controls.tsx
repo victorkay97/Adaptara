@@ -6,6 +6,10 @@ export type WorkspaceTarget = "overview" | "intelligence" | "strategy" | "policy
 export type QueryProjection<T> = { isPending: boolean; isError: boolean; data?: T };
 export type WorkspaceReadiness = { wallet: string; network: string; vault: string; portfolio: string };
 
+export function deriveDefaultPortfolioSource(vaultStatus: VaultDiscovery["status"] | undefined): PortfolioSource {
+  return vaultStatus === "available" ? "vault" : "wallet";
+}
+
 export function deriveWorkspaceReadiness({ isConnected, onXLayer, source, wallet, vault, vaultPortfolio }: { isConnected: boolean; onXLayer: boolean; source: PortfolioSource; wallet: QueryProjection<PortfolioSnapshot>; vault: QueryProjection<VaultDiscovery>; vaultPortfolio: QueryProjection<PortfolioSnapshot> }): WorkspaceReadiness {
   if (!isConnected) return { wallet: "Not connected", network: "Awaiting wallet", vault: "Unavailable", portfolio: "Not loaded" };
   if (!onXLayer) return { wallet: "Connected", network: "Wrong network", vault: "Unavailable", portfolio: "Unavailable" };

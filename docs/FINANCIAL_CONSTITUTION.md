@@ -1,5 +1,28 @@
 # Financial Constitution
 
+## Per-Vault scope
+
+Every V1 or V2 Managed Vault owns its own Constitution. Sibling Vaults do not share reserve, concentration, aggressive-exposure, action, turnover, mode, pause, replay, or yield-policy state. Aggregated UI must never imply one wallet-wide Constitution.
+
+## Phase 13B atomic enforcement
+
+`AdaptiveManagedVaultV1` stores the same four existing Constitution meanings and enforces them against actual post-swap balances. Every managed balance is converted to a common 18-decimal value basis through an immutable typed valuation provider. Reserve and Aggressive classification use the existing onchain `AssetRegistry.baselineRiskTier`; MARA and the executor supply neither prices nor classifications.
+
+- `minimumReserveBps` is aggregate post-state value classified Reserve, rounded down.
+- `maximumSingleAssetExposureBps` applies to every managed asset, with exposure rounded up so rounding cannot hide an excess.
+- `maximumAggressiveExposureBps` is aggregate post-state Aggressive value, rounded up.
+- `maximumDailyReallocationBps` combines with the execution-policy daily maximum by taking the stricter value. Successful action value is accumulated in UTC-day BPS; reverted execution consumes nothing.
+
+Phase 13A's single-action BPS is made authoritative in the managed vault: `amountIn` is valued onchain and compared with the configured maximum BPS of total pre-action managed value. The typed minimum output must also be no weaker than the provider-derived fair output less the configured maximum slippage, and actual received balance must meet that minimum.
+
+The local mock provider is test infrastructure, not production valuation. Production freshness, oracle selection, and governance are Phase 13C work.
+
+## Phase 13A execution-policy extension
+
+The deployed four-field `AdaptiveVault.policy` remains canonical and unchanged. Phase 13A adds a separate `AutonomousMandateV1.ExecutionPolicy` for future autonomous execution: maximum single-action BPS, maximum cumulative UTC-day turnover BPS, maximum slippage BPS, maximum intent lifetime, an autonomous-management enable flag, and owner-instruction-only yield compound/reserve BPS. All percentage fields use the existing 10,000 BPS denominator; yield compound plus reserve must equal 10,000.
+
+Management mode, execution policy, and local asset/adapter allowlists are owner-controlled. Missing policy is never treated as zero or permission. Acceptance in Adaptive mode reserves an intent identifier and daily turnover only; it is not execution and does not prove the supplied exposure BPS against authoritative valuation. The original reserve, single-asset, aggressive-exposure, and daily policy meanings are unchanged. Before a later phase moves assets, its executor must reread and enforce both policy records against authoritative onchain state and fail closed when valuation is unavailable.
+
 Phase 6 defines the vault owner's deterministic portfolio-policy boundary. It is structured user input, not a MARA recommendation, trade instruction, or autonomous execution capability. The application representation is versioned `phase-6.v1`; Solidity storage is unchanged.
 
 All four values are integer basis points from 0 through 10,000. `minimumReserveBps` is the minimum aggregate allocation to baseline-Reserve assets. `maximumSingleAssetExposureBps` caps each supported asset. `maximumAggressiveExposureBps` caps aggregate baseline-Aggressive assets. `maximumDailyReallocationBps` constrains each Phase 7 simulation plan. Cumulative daily execution accounting still does not exist because Phase 7 performs no execution. Baseline catalog classification is deliberately used; Phase 4's dynamic `currentRiskTier` is independent risk intelligence.

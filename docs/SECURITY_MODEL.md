@@ -1,5 +1,37 @@
 # Security Model
 
+## Multi-Vault V2 threat model
+
+The V2 creation helper is bound immutably to its deploying factory and rejects all other callers. It only constructs `AdaptiveManagedVaultV1` with the factory-supplied owner and guardian, a forced-zero executor, and fixed shared dependencies; it has no post-creation authority.
+
+Sibling Vaults share only immutable read dependencies. They share no custody, Constitution, mode, pause flag, replay map, turnover bucket, asset enumeration, allowances, or yield accounting. An owner controls only Vaults they own; the factory, shared admins, MARA, adapters, and sibling Vaults cannot withdraw. The factory has no upgrade path or continuing privilege. A 16-Vault owner cap and bounded pagination prevent enumeration exhaustion. Activity must label onchain events as authoritative and MARA/planner records as offchain; a reverted policy violation cannot persist an onchain `ActionBlocked` event.
+
+## Phase 13E supply-only Aave boundary
+
+The Aave adapter is pinned to chain 196, the verified Pool, USDT, and aUSDT. It has no borrowing, debt delegation, flash-loan, collateral-toggle, arbitrary-recipient, arbitrary-Pool, or arbitrary-calldata function. Exact approvals are reset and temporary adapter custody must end at zero. The Vault owns the aToken position. Liquid reserve excludes yield-deployed capital, while concentration aggregates liquid and supplied USDT exposure. Principal and checkpointed retained yield cannot be swept repeatedly as new yield. Failed actions atomically roll back token movement, replay, turnover, and accounting.
+
+## Phase 13B restricted execution and atomic rollback
+
+Phase 13B introduces real contract-level swap execution only in the undeployed, versioned `AdaptiveManagedVaultV1`. Custody never moves to an executor account. The vault temporarily authorizes only the selected adapter for the exact input amount and resets the allowance in the same transaction. A malicious overpull fails at ERC-20 allowance enforcement; success leaves zero residual allowance. The execution entry points and owner withdrawal are protected by OpenZeppelin `ReentrancyGuard`.
+
+Approval Required and Adaptive use one internal pipeline with different caller gates. Advisory has no execution path. The owner cannot use approval as a Constitution bypass; both paths require current policies, managed assets, an allowed adapter, a fresh unique intent, authoritative fresh valuation, value-based action/daily/slippage limits, actual balance deltas, and compliant post-state reserve/concentration/aggressive exposure.
+
+Intent consumption and daily turnover are written before the adapter call to follow checks-effects-interactions, but Solidity atomicity rolls them back with token movements and approvals if the adapter, delta checks, valuation, or final policy check fails. `SwapExecuted` and the execution record occur only after every invariant passes. The adapter's reported output cannot substitute for actual vault balances.
+
+The provider and asset registry are immutable, and managed assets are an append-only owner list bounded at 32. The executor cannot change prices, classifications, policy, mode, pause state, allowlists, roles, or recipients; it receives no arbitrary target or calldata surface. The existing deployed vault and Phase 13A mandate retain their prior non-executing behavior.
+
+Phase 13B deliberately excludes production adapters, live routing, Chainlink, OKX, Agentic Wallet, Aave, external LLM/news calls, deployment, and production-security claims.
+
+## Phase 13A autonomous mandate foundation
+
+Phase 13A adds `AutonomousMandateV1` beside, rather than inside, the already deployed non-upgradeable `AdaptiveVault`. The mandate is bound to one vault and dynamically reads that vault's owner, executor, and pause state. It holds no funds, cannot transfer or approve tokens, cannot call the vault, and cannot invoke an adapter. The user's external wallet is never a capital source: only balances intentionally deposited in the existing vault can be managed by a future execution layer.
+
+The owner alone configures management mode, execution policy, asset and adapter allowlists, and the mandate emergency pause. Advisory and Approval Required modes reject the autonomous pathway. Adaptive mode still requires the current vault executor, both pause layers to be open, a configured/enabled policy, bounded allowlisted typed input, and a fresh deadline. Revoking the vault executor takes effect immediately. The executor cannot alter either Constitution, change allowlists, unpause, withdraw, approve, or make an arbitrary call.
+
+`acceptSwapIntent` is an auditable authorization reservation, not a trade: it hashes typed fields, prevents replay, and consumes UTC-day turnover BPS, but deliberately causes no asset movement and emits no execution event. `actionExposureBps` is planner input and therefore is not sufficient transaction authority. A later phase must recompute it from authoritative balances and approved valuation, reread the existing four Constitution limits, execute through a reviewed adapter with bounded approvals and reentrancy protection, and atomically verify actual balances. Until that complete validator/executor exists, Phase 13A exposes no execution function and therefore fails closed.
+
+The yield compound/reserve BPS fields store only the owner's instruction and must sum to 10,000. They are not accounting: principal, protocol yield, realized gain/loss, and unrealized PnL remain undefined until approved strategy adapters provide an authoritative basis.
+
 ## Phase 11 adversarial hardening
 
 Phase 11 revalidated every existing authority boundary under hostile runtime objects, provider output, RPC failures, cached state, token behavior, and direct contract callers. It added no execution capability. Runtime consumers fail closed, simulations remain non-authoritative, and future execution must reread chain state. The complete findings and authority inventory are in `SECURITY_REVIEW.md`.
@@ -92,3 +124,18 @@ Yield Intelligence has no signer, transaction, protocol adapter, network, or arb
 ## Current integrated security status
 
 The deterministic Risk Engine is implemented, and configured portfolio reads use live X Layer onchain balances while retaining demo/non-live valuation references. The Financial Constitution is active in the deployed, non-upgradeable demo vault; `setPolicy` remains an explicit owner-controlled wallet write with receipt confirmation and an onchain reread. MARA remains advisory, Sentinel remains non-executing, Adaptation and Yield remain simulations, and none receives a signing key or arbitrary transaction authority. ERC-8021 Builder attribution is metadata appended to the existing owner write and grants no contract or asset authority. The vault contracts remain constrained: no pooled custody, generic execute, arbitrary call, `delegatecall`, trading router, or autonomous execution path has been added.
+# Phase 13C provider boundary
+
+## Phase 13D route boundary
+
+MARA supplies direction only; deterministic planning owns quantities; OKX supplies untrusted routing; configured trust and the Constitution validate it. Broadcast is disabled, no router calldata reaches an executor, and the OKX adapter remains a documented NO-GO pending verifiable ABI semantics. See `docs/PHASE_13D_EXECUTION.md`.
+
+## Phase 13D.1 direct Uniswap boundary
+
+External market/news sources are advisory evidence. MARA supplies direction. The deterministic planner supplies the amount. QuoterV2 supplies expected output only. The Financial Constitution is the authority constraint. `UniswapV3SwapAdapterV1` is a narrow typed execution mechanism. The managed Vault retains custody and independently enforces actual balance deltas and post-state policy. See `docs/PHASE_13D1_UNISWAP_EXECUTION.md`.
+
+See `docs/PHASE_13C_OBSERVATION.md` for feed validity, provenance, stale/future rejection, provider-outage behavior, adapter-registry separation, token compatibility assumptions, monitoring, and recovery.
+
+## Phase 13C.1 hardening
+
+See `docs/PHASE_13C1_HARDENING.md` for exact 4–32 asset gas scaling, stateful invariant configuration/results, the enforced protocol-supported ∩ owner-enabled adapter boundary, token exclusions, and Phase 13D prerequisites.

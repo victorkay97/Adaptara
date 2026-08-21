@@ -1,0 +1,2 @@
+import { describe,expect,it } from "vitest"; import { SimulationOnlyExecutor } from "./executor";
+describe("simulation-only executor",()=>{it("reports address and never broadcasts",async()=>{const e=new SimulationOnlyExecutor("0x0000000000000000000000000000000000000001",async()=>true);expect(await e.address()).toContain("0001");await expect(e.broadcast()).rejects.toThrow("BROADCAST_DISABLED_PHASE_13D")})});

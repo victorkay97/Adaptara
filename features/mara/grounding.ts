@@ -1,5 +1,5 @@
 import { createAssetCatalog } from "@/features/portfolio/catalog";
-import { ASSET_IDS, type AssetId, type BaselineRiskTier } from "@/features/portfolio/types";
+import { ASSET_IDS, type AssetId, type BaselineRiskTier, type CanonicalAssetId } from "@/features/portfolio/types";
 import { RISK_FACTOR_WEIGHTS, RISK_SCORE_MAX } from "@/features/risk/constants";
 import { RISK_FACTOR_IDS, type CurrentRiskTier, type RiskFactorId } from "@/features/risk/types";
 import type { MaraContext, MaraGroundingFact } from "./types";
@@ -24,9 +24,9 @@ export function validateCompleteMaraContext(context: MaraContext): void {
 
   for (const fact of context.facts) {
     const assetMatch = /^asset\.([^.]+)\./.exec(fact.id);
-    if (assetMatch && !ASSET_IDS.includes(assetMatch[1] as AssetId)) fail();
+    if (assetMatch && !ASSET_IDS.includes(assetMatch[1] as CanonicalAssetId)) fail();
   }
-  const assetIds = context.facts.map((fact) => /^asset\.([^.]+)\.symbol$/.exec(fact.id)?.[1]).filter((id): id is AssetId => Boolean(id && ASSET_IDS.includes(id as AssetId)));
+  const assetIds = context.facts.map((fact) => /^asset\.([^.]+)\.symbol$/.exec(fact.id)?.[1]).filter((id): id is CanonicalAssetId => Boolean(id && ASSET_IDS.includes(id as CanonicalAssetId)));
   if (!assetIds.length || new Set(assetIds).size !== assetIds.length) fail();
 
   const rules = new Map<string, FactRule>([
