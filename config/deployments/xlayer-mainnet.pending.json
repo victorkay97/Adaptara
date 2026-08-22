@@ -1,0 +1,36 @@
+{
+  "status": "pending-human-authorization",
+  "chainId": 196,
+  "evidenceBlock": 67873770,
+  "releaseMode": "approval-required",
+  "external": {
+    "uniswapFactory": "0x4B2ab38DBF28D31D467aA8993f6c2585981D6804",
+    "uniswapRouter02": "0x4f0C28f5926AFDA16bf2506D5D9e57Ea190f9bcA",
+    "uniswapQuoterV2": "0xD1b797D92d87B688193A2B976eFc8D577D204343",
+    "xEthUsdtPool500": "0x77ef18adF35f62B2Ad442e4370cDbC7fe78B7dcC",
+    "aavePool": "0xE3F3Caefdd7180F884c01E57f65Df979Af84f116",
+    "aavePoolAddressesProvider": "0xdFf435BCcf782f11187D3a4454d96702eD78e092",
+    "aaveDataProvider": "0x6C505C31714f14e8af2A03633EB2Cdfb4959138F",
+    "aaveOracle": "0x91FC11136d5615575a0fC5981Ab5C0C54418E2C6",
+    "sequencerUptimeFeed": "0x45c2b8C204568A03Dc7A2E32B71D67Fe97F908A"
+  },
+  "assets": {
+    "USDT": { "address": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736", "decimals": 6, "aaveSource": "0x7ec7E5497EAf312FE82F8307D05eb0E5f0f157D3", "priceFeed": "0xb928a0678352005a2e51F614efD0b54C9830dB80", "maximumAge": 90000, "valuationBasis": "USDT/USD", "liveManagement": true },
+    "xETH": { "address": "0xE7B000003A45145decf8a28FC755aD5eC5EA025A", "decimals": 18, "aaveSource": "0x8b85b50535551F8E8cDAF78dA235b5Cf1005907b", "priceFeed": "0x8b85b50535551F8E8cDAF78dA235b5Cf1005907b", "maximumAge": 90000, "valuationBasis": "ETH/USD", "riskNotes": "1:1 market valuation; wrapper custody, redemption, concentration, and liquidity risk enforced through Constitution limits, not a price haircut", "liveManagement": true }
+  },
+  "oraclePolicy": { "sequencerGracePeriodSeconds": 3600, "priceFeedMaximumAgePolicy": "24-hour heartbeat plus 1-hour operational margin" },
+  "admin": { "address": null, "status": "PRODUCTION_ADMIN_REQUIRED" },
+  "executor": { "address": null, "adaptiveStatus": "BLOCKED", "approvalRequiredDeploymentBlocked": false },
+  "capabilities": { "uniswapXethToUsdt": true, "uniswapUsdtToXeth": false, "aaveNewSupplyEnabled": true, "aaveWithdrawEnabled": true, "adaptiveExecutorEnabled": false },
+  "adaptara": {
+    "assetRegistry": null,
+    "valuationProvider": null,
+    "protocolAdapterRegistry": null,
+    "uniswapAdapter": null,
+    "aaveAdapter": null,
+    "managedVaultFactory": null,
+    "managedVaultFactoryV2": "0x98dE37855b85993C0cA6746b667BA01f2894efad"
+  },
+  "deploymentOrder": ["AssetRegistry", "ChainlinkValuationProviderV1", "ProtocolAdapterRegistryV1", "UniswapV3SwapAdapterV1", "AaveV3YieldAdapterV1", "AdaptiveManagedVaultFactoryV1"],
+  "additiveV2": { "implemented": true, "deployed": true, "postDeploymentVerified": true, "address": "0x98dE37855b85993C0cA6746b667BA01f2894efad", "helper": "0x9550049F7896599630D6eE7D6D3E5F72b9A1DA0C", "transactionHash": "0x6c407bc749b62565e4b8c1380605f036d35f6a178ebe9ee5fd63e083f6b5549c", "block": 68405395, "frontendEnvKey": "NEXT_PUBLIC_ADAPTARA_FACTORY_V2_ADDRESS", "frontendMode": "read-only", "publicWritesEnabled": false, "requiresSharedGovernanceMutation": false }
+}

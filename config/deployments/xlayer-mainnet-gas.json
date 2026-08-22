@@ -1,0 +1,36 @@
+{
+  "chainId": 196,
+  "block": 68133772,
+  "simulation": "forge script no-broadcast",
+  "gasPriceWei": "40000001",
+  "deploymentGas": {
+    "assetRegistry": "1391462",
+    "chainlinkValuationProviderV1": "1890627",
+    "protocolAdapterRegistryV1": "1256559",
+    "uniswapV3SwapAdapterV1": "2222946",
+    "aaveV3YieldAdapterV1": "1453440",
+    "adaptiveManagedVaultFactoryV1": "6936204"
+  },
+  "configurationGas": {
+    "registerUsdt": "107724",
+    "registerXeth": "101722",
+    "configureUsdtFeed": "141900",
+    "configureXethFeed": "134000",
+    "registerUniswapAdapter": "141222",
+    "registerAaveAdapter": "133393",
+    "configureXethToUsdtPair": "85354",
+    "revokePairConfigurator": "34795",
+    "beginAssetRegistryAdminTransfer": "46321",
+    "beginValuationAdminTransfer": "46321",
+    "beginProtocolRegistryAdminTransfer": "46321",
+    "beginUniswapAdminTransfer": "46282",
+    "scriptTransactionOverhead": "0"
+  },
+  "transactionCount": 18,
+  "totalGas": "16216593",
+  "estimatedRawOkbWei": "648663736216593",
+  "estimatedRawOkb": "0.000648663736216593",
+  "bufferPercent": 40,
+  "recommendedOkbWei": "908129230703231",
+  "recommendedOkb": "0.000908129230703231"
+}

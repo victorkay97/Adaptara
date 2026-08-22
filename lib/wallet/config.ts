@@ -1,16 +1,30 @@
 import { fallback, http } from "viem";
-import { createConfig } from "wagmi";
-import { injected, walletConnect } from "wagmi/connectors";
-import { xLayerTestnet } from "@/lib/chain/xlayer";
+import { WagmiAdapter } from "@reown/appkit-adapter-wagmi";
+import { isLiveReadOnlyMode, xLayerMainnet, xLayerTestnet } from "@/lib/chain/xlayer";
 import { publicEnv } from "@/lib/env/public";
+import { createAppKitMetadata } from "@/lib/wallet/metadata";
+import { okxUniversalConnector } from "@/lib/wallet/okx-universal-connector";
 
-export const wagmiConfig = createConfig({
-  chains: [xLayerTestnet],
-  connectors: publicEnv.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID
-    ? [injected(), walletConnect({ projectId: publicEnv.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID })]
-    : [injected()],
-  transports: { [xLayerTestnet.id]: fallback([http(publicEnv.NEXT_PUBLIC_XLAYER_RPC_URL), http(publicEnv.NEXT_PUBLIC_XLAYER_FALLBACK_RPC_URL)]) },
+const configuredProjectId = publicEnv.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID;
+if (!configuredProjectId) throw new Error("NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID is required for wallet connectivity");
+export const walletConnectProjectId: string = configuredProjectId;
+
+export const appKitNetworks = isLiveReadOnlyMode
+  ? [xLayerMainnet, xLayerTestnet] as const
+  : [xLayerTestnet, xLayerMainnet] as const;
+export const xLayerTransports = {
+  196: fallback(xLayerMainnet.rpcUrls.default.http.map((url) => http(url))),
+  1952: fallback(xLayerTestnet.rpcUrls.default.http.map((url) => http(url))),
+} as const;
+export const wagmiAdapter = new WagmiAdapter({
+  networks: [...appKitNetworks],
+  projectId: walletConnectProjectId,
   ssr: true,
+  connectors: [okxUniversalConnector()],
+  transports: xLayerTransports,
 });
+
+export const wagmiConfig = wagmiAdapter.wagmiConfig;
+export const appKitMetadata = publicEnv.NEXT_PUBLIC_APP_URL ? createAppKitMetadata(publicEnv.NEXT_PUBLIC_APP_URL) : undefined;
 
 declare module "wagmi" { interface Register { config: typeof wagmiConfig } }

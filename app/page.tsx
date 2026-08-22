@@ -1,5 +1,5 @@
-import { Dashboard } from "@/components/layout/dashboard";
+import { LandingPage } from "@/features/experience/components/landing-page";
 
 export default function Home() {
-  return <Dashboard />;
+  return <LandingPage />;
 }

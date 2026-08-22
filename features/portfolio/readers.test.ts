@@ -14,6 +14,11 @@ const client = (overrides = {}) => ({ getChainId: vi.fn().mockResolvedValue(1952
 const readWallet = (portfolioClient: PublicClient, assets = createAssetCatalog()) => readWalletPortfolio({ client: portfolioClient, accountAddress: account, assets, priceProvider: new DemoReferencePriceProvider() });
 
 describe("portfolio readers without Multicall3", () => {
+  it("permits an explicit chain-196 read through the supplied read-only client", async () => {
+    const mainnetClient = client({ getChainId: vi.fn().mockResolvedValue(196), readContract: vi.fn(async ({ functionName }: ReadArgs) => functionName === "balanceOf" ? 0n : 6) });
+    const snapshot = await readWalletPortfolio({ client: mainnetClient, accountAddress: account, assets: createAssetCatalog(), priceProvider: new DemoReferencePriceProvider(), expectedChainId: 196 });
+    expect(snapshot.chainId).toBe(196);
+  });
   it("reads a wallet with no multicall action or chain Multicall3 configuration", async () => { const portfolioClient = client({ readContract: vi.fn(async ({ functionName }: ReadArgs) => functionName === "balanceOf" ? 1_250_000n : 6) }); expect("multicall" in portfolioClient).toBe(false); const snapshot = await readWallet(portfolioClient); expect(snapshot.source).toBe("wallet"); expect(snapshot.positions[0].rawBalance).toBe(1_250_000n); expect(snapshot.blockConsistency).toBe("single-block"); });
   it("pins every configured balance and decimals read to one captured block", async () => { const readContract = vi.fn(async ({ functionName }: ReadArgs) => functionName === "balanceOf" ? 1n : 18); const portfolioClient = client({ readContract }); const snapshot = await readWallet(portfolioClient, createAssetCatalog(sandboxAddresses)); expect(portfolioClient.getBlockNumber).toHaveBeenCalledOnce(); expect(snapshot.blockNumber).toBe(42n); expect(readContract).toHaveBeenCalledTimes(8); expect(readContract.mock.calls.every(([args]) => args.blockNumber === 42n)).toBe(true); });
   it("isolates one balance failure as read-error and never zero", async () => { const readContract = vi.fn(async ({ functionName }: ReadArgs) => { if (functionName === "balanceOf") throw new Error("balance RPC failed"); return 6; }); const snapshot = await readWallet(client({ readContract })); expect(snapshot.positions[0]).toMatchObject({ availability: "read-error", rawBalance: null }); });
@@ -25,7 +30,16 @@ describe("portfolio readers without Multicall3", () => {
 });
 
 describe("vault discovery", () => {
-  it("handles unconfigured, absent, and available vaults", async () => { expect(await discoverVault(client(), account)).toEqual({ status: "not-configured" }); expect(await discoverVault(client(), account, factory)).toEqual({ status: "not-created" }); expect(await discoverVault(client({ readContract: vi.fn().mockResolvedValue(vaultAddress) }), account, factory)).toEqual({ status: "available", address: vaultAddress }); });
+  it("handles unconfigured, absent, and V1-only available vaults", async () => {
+    expect(await discoverVault(client(), account)).toEqual({ status: "not-configured" });
+    expect(await discoverVault(client(), account, factory)).toEqual({ status: "not-created" });
+    expect(await discoverVault(client({ readContract: vi.fn().mockResolvedValue(vaultAddress) }), account, factory)).toEqual({
+      status: "available",
+      address: vaultAddress,
+      selected: { address: vaultAddress, source: "v1", owner: account, index: 0 },
+      vaults: [{ address: vaultAddress, source: "v1", owner: account, index: 0 }],
+    });
+  });
   it("returns explicit wrong-chain and read errors", async () => { expect(await discoverVault(client({ getChainId: vi.fn().mockResolvedValue(1) }), account, factory)).toEqual({ status: "wrong-chain" }); expect((await discoverVault(client({ readContract: vi.fn().mockRejectedValue(new Error("RPC")) }), account, factory)).status).toBe("read-error"); });
   it("converts a chain ID RPC rejection into read-error", async () => { expect(await discoverVault(client({ getChainId: vi.fn().mockRejectedValue(new Error("chain unavailable")) }), account, factory)).toEqual({ status: "read-error", error: "chain unavailable" }); });
   it("discovers the confirmed demo vault through the factory boundary", async () => {
@@ -33,8 +47,43 @@ describe("vault discovery", () => {
     const confirmedFactory = getAddress("0xBE65de08FFbF819B124cbD2C8C88C21bAcdA8c2e");
     const confirmedVault = getAddress("0xb49163f7A426c7f739F008AaAe062cCEc62EBEb4");
     const readContract = vi.fn().mockResolvedValue(confirmedVault);
-    expect(await discoverVault(client({ readContract }), demoOwner, confirmedFactory)).toEqual({ status: "available", address: confirmedVault });
-    expect(readContract).toHaveBeenCalledWith(expect.objectContaining({ address: confirmedFactory, functionName: "vaultOf", args: [demoOwner] }));
+    expect(await discoverVault(client({ readContract }), demoOwner, confirmedFactory)).toMatchObject({
+      status: "available",
+      address: confirmedVault,
+      selected: { address: confirmedVault, source: "v1", index: 0 },
+    });
+    expect(readContract).toHaveBeenCalledWith(expect.objectContaining({ address: confirmedFactory, functionName: "managedVaultOf", args: [demoOwner] }));
+  });
+  it("combines V1 and V2 discovery without duplicating the V1 vault", async () => {
+    const factoryV2 = getAddress("0x0000000000000000000000000000000000000004");
+    const secondVault = getAddress("0x0000000000000000000000000000000000000005");
+    const readContract = vi.fn(async ({ address, functionName, args }: { address: string; functionName: string; args?: readonly unknown[] }) => {
+      if (address === factory && functionName === "managedVaultOf") return vaultAddress;
+      if (address === factoryV2 && functionName === "vaultCount") return 2n;
+      if (address === factoryV2 && functionName === "vaultAt") {
+        return args?.[1] === 0n ? vaultAddress : secondVault;
+      }
+      throw new Error("unexpected read");
+    });
+    const result = await discoverVault(client({ readContract }), account, factory, factoryV2);
+    expect(result).toEqual({
+      status: "available",
+      address: vaultAddress,
+      selected: { address: vaultAddress, source: "v1", owner: account, index: 0 },
+      vaults: [
+        { address: vaultAddress, source: "v1", owner: account, index: 0 },
+        { address: secondVault, source: "v2", owner: account, index: 1 },
+      ],
+    });
+  });
+  it("keeps a valid V1 Vault available when V2 enumeration fails", async () => {
+    const factoryV2 = getAddress("0x0000000000000000000000000000000000000004");
+    const readContract = vi.fn(async ({ address }: { address: string }) => {
+      if (address === factory) return vaultAddress;
+      throw new Error("V2 unavailable");
+    });
+    const result = await discoverVault(client({ readContract }), account, factory, factoryV2);
+    expect(result).toMatchObject({ status: "available", address: vaultAddress, issues: [{ source: "v2", message: "V2 unavailable" }] });
   });
 });
 

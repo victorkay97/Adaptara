@@ -1,0 +1,25 @@
+{
+  "chainId": 196,
+  "releaseMode": "approval-required",
+  "rpcEnv": "XLAYER_MAINNET_RPC_URL",
+  "assetRegistry": "REQUIRED_DEPLOYMENT_ADDRESS",
+  "valuationProvider": "REQUIRED_DEPLOYMENT_ADDRESS",
+  "protocolAdapterRegistry": "REQUIRED_DEPLOYMENT_ADDRESS",
+  "uniswapAdapter": "REQUIRED_DEPLOYMENT_ADDRESS",
+  "aaveAdapter": "REQUIRED_DEPLOYMENT_ADDRESS",
+  "managedVaultFactory": "REQUIRED_DEPLOYMENT_ADDRESS",
+  "executor": null,
+  "initialAdmin": "REQUIRED_ADMIN_ADDRESS",
+  "adminDelaySeconds": 172800,
+  "sequencerGracePeriodSeconds": 3600,
+  "external": {
+    "uniswapFactory": "0x4B2ab38DBF28D31D467aA8993f6c2585981D6804",
+    "uniswapRouter02": "0x4f0C28f5926AFDA16bf2506D5D9e57Ea190f9bcA",
+    "uniswapQuoterV2": "0xD1b797D92d87B688193A2B976eFc8D577D204343",
+    "aavePool": "0xE3F3Caefdd7180F884c01E57f65Df979Af84f116",
+    "aaveDataProvider": "0x6C505C31714f14e8af2A03633EB2Cdfb4959138F",
+    "sequencerUptimeFeed": "0x45c2b8C204568A03Dc7A2E32B71D67Fe97F908A9"
+  },
+  "assets": [{"symbol":"USDT","address":"0x779Ded0c9e1022225f8E0630b35a9b54bE713736","decimals":6,"feed":"0xb928a0678352005a2e51F614efD0b54C9830dB80","feedDecimals":8,"maximumAgeSeconds":90000,"valuationBasis":"USDT/USD","liveManagement":true},{"symbol":"xETH","address":"0xE7B000003A45145decf8a28FC755aD5eC5EA025A","decimals":18,"feed":"0x8b85b50535551F8E8cDAF78dA235b5Cf1005907b","feedDecimals":8,"maximumAgeSeconds":90000,"valuationBasis":"ETH/USD","liveManagement":true}],
+  "capabilities": {"uniswapXethToUsdt":true,"uniswapUsdtToXeth":false,"aaveNewSupplyEnabled":true,"aaveWithdrawEnabled":true,"adaptiveExecutorEnabled":false}
+}

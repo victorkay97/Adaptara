@@ -2,14 +2,25 @@ import { renderToStaticMarkup } from "react-dom/server";
 import type { ReactElement } from "react";
 import { describe, expect, it, vi } from "vitest";
 import type { PortfolioSnapshot, VaultDiscovery } from "@/features/portfolio/types";
-import { canReadVaultPortfolio, deriveVaultNavigation, deriveWorkspaceReadiness, hasUsableVaultSnapshot, ReadinessSummary, SourceSwitcher, WorkspaceAuthorityGate, WorkspaceNavigation, WorkspacePanel, WorkspaceSourceContent, type PortfolioSource } from "./workspace-controls";
+import { canReadVaultPortfolio, deriveDefaultPortfolioSource, deriveVaultNavigation, deriveWorkspaceReadiness, hasUsableVaultSnapshot, ReadinessSummary, SourceSwitcher, WorkspaceAuthorityGate, WorkspaceNavigation, WorkspacePanel, WorkspaceSourceContent, type PortfolioSource } from "./workspace-controls";
 
 const snapshot = (source: PortfolioSource, valuationStatus: PortfolioSnapshot["valuationStatus"] = "valued") => ({ source, valuationStatus } as PortfolioSnapshot);
 const idle = <T,>(data?: T) => ({ isPending: false, isError: false, data });
+const availableVault = { status: "available", address: "0x0000000000000000000000000000000000000001", vaults: [], selected: { source: "v1", address: "0x0000000000000000000000000000000000000001", owner: "0x0000000000000000000000000000000000000002", index: 0 } } as const satisfies VaultDiscovery;
 
 describe("Phase 10 readiness and navigation coherence", () => {
+  it("defaults to a discovered vault without removing explicit wallet selection", () => {
+    expect(deriveDefaultPortfolioSource("available")).toBe("vault");
+    expect(deriveDefaultPortfolioSource("not-created")).toBe("wallet");
+    expect(deriveDefaultPortfolioSource(undefined)).toBe("wallet");
+    let selected: PortfolioSource = deriveDefaultPortfolioSource("available");
+    const switcher = SourceSwitcher({ value: selected, onChange: (next) => { selected = next; } });
+    const buttons = switcher.props.children as ReactElement<{ onClick: () => void }>[];
+    buttons[0].props.onClick();
+    expect(selected).toBe("wallet");
+  });
   it("ignores cached valued and available X Layer data on the wrong network", () => {
-    const readiness = deriveWorkspaceReadiness({ isConnected: true, onXLayer: false, source: "wallet", wallet: idle(snapshot("wallet")), vault: idle({ status: "available", address: "0x0000000000000000000000000000000000000001" } as VaultDiscovery), vaultPortfolio: idle(snapshot("vault")) });
+    const readiness = deriveWorkspaceReadiness({ isConnected: true, onXLayer: false, source: "wallet", wallet: idle(snapshot("wallet")), vault: idle(availableVault), vaultPortfolio: idle(snapshot("vault")) });
     expect(readiness).toEqual({ wallet: "Connected", network: "Wrong network", vault: "Unavailable", portfolio: "Unavailable" });
     const html = renderToStaticMarkup(<ReadinessSummary readiness={readiness} />);
     expect(html).not.toContain("Valued");
@@ -31,7 +42,7 @@ describe("Phase 10 readiness and navigation coherence", () => {
   });
 
   it("reports an available vault portfolio query error as unavailable", () => {
-    const readiness = deriveWorkspaceReadiness({ isConnected: true, onXLayer: true, source: "vault", wallet: idle(), vault: idle({ status: "available", address: "0x0000000000000000000000000000000000000001" } as VaultDiscovery), vaultPortfolio: { isPending: false, isError: true } });
+    const readiness = deriveWorkspaceReadiness({ isConnected: true, onXLayer: true, source: "vault", wallet: idle(), vault: idle(availableVault), vaultPortfolio: { isPending: false, isError: true } });
     expect(readiness).toMatchObject({ vault: "Available", portfolio: "Unavailable" });
   });
 

@@ -1,6 +1,6 @@
 import { getAddress } from "viem";
 import { ASSET_CATALOG } from "@/features/portfolio/catalog";
-import { ASSET_IDS, type AssetPosition, type PortfolioSnapshot } from "@/features/portfolio/types";
+import { ASSET_IDS, type AssetPosition, type CanonicalAssetId, type PortfolioSnapshot } from "@/features/portfolio/types";
 import { evaluateConstitutionCompliance } from "@/features/constitution/compliance";
 import { evaluateConstitutionFeasibility } from "@/features/constitution/feasibility";
 import { validateConstitution } from "@/features/constitution/validation";
@@ -31,7 +31,7 @@ function validateSnapshot(snapshot: PortfolioSnapshot): string[] {
   if (ids.length !== ASSET_IDS.length || ASSET_IDS.some((id) => !ids.includes(id))) errors.push("The portfolio must contain every canonical Adaptara asset exactly once.");
   for (const position of snapshot.positions) {
     const canonical = catalogById.get(position.asset.id);
-    if (!canonical || !ASSET_IDS.includes(position.asset.id)) errors.push("The portfolio contains a non-canonical asset ID.");
+    if (!canonical || !ASSET_IDS.includes(position.asset.id as CanonicalAssetId)) errors.push("The portfolio contains a non-canonical asset ID.");
     else if (
       position.asset.symbol !== canonical.symbol
       || position.asset.displayName !== canonical.displayName

@@ -8,7 +8,7 @@ This checklist reflects the current submission-packaging state. A `READY` item h
 - [x] Tagline: Adaptive intelligence for onchain wealth.
 - [x] Short and long submission copy: `docs/SUBMISSION.md`
 - [x] Architecture: advisory intelligence separated from deterministic/onchain authority
-- [x] X Layer usage: live testnet contracts, reads, owner actions, and deployment evidence
+- [x] X Layer progression: initial Testnet evidence plus production-hardened Mainnet deployment
 - [x] Builder Code: `tl5ce7n7gk5a5pzk`
 - [x] Builder registration proof: [OKLink transaction](https://www.oklink.com/x-layer-testnet/tx/0x62d2c221dc73a44502e78529d5add9ad4cca51329377beab6064d51d041b61ef)
 - [x] ERC-8021 attributed proof: [OKLink transaction](https://www.oklink.com/x-layer-testnet/tx/0x7fdfecc0b989992c33e4e586f56a508bae2c0d5f4b70e650960267e54e56493e)
@@ -19,15 +19,28 @@ This checklist reflects the current submission-packaging state. A `READY` item h
 - [x] Active Constitution: 20% reserve / 60% single asset / 30% aggressive / 10% daily reallocation
 - [x] AI explanation: MARA is advisory and cannot sign or send transactions
 - [x] Security model and Phase 11 adversarial review
-- [x] Test evidence: 402 TypeScript tests; 67 Foundry tests across 7 suites
+- [x] Test evidence: 591 frontend tests across 67 files; 160 Foundry tests across 21 suites
+- [x] Public GitHub repository: https://github.com/victorkay97/Adaptara
+- [x] Live application: https://adaptara.vercel.app/
 - [x] Demo flow: `docs/DEMO_GUIDE.md`
 - [x] Sandbox disclosure: sTRSY, sXAU, and sAAPLx confer no backing, redemption, collateral, or ownership rights
-- [x] Known limitations: no autonomous/trading execution, real redemption, live yield, price prediction, or pooled custody
+- [x] Controlled rollout disclosed: read-only public production discovery, public writes disabled, Adaptive disabled, Activity ingestion limited
 
-## NEEDS URL
+## PRODUCTION ACCEPTANCE — MANUAL
 
-- [ ] GitHub: `TBD — public repository URL required`
-- [ ] Live application: `TBD — deployed application URL required`
+- [x] Public application reachable
+- [x] Canonical demo-owner vault discovered on X Layer Testnet
+- [x] Canonical demo/non-live $20 reference portfolio displayed at 40/30/20/10
+- [x] Active Constitution displayed at 20% reserve / 60% single asset / 30% aggressive / 10% daily reallocation
+- [x] MARA completed a real production advisory analysis
+- [x] Deterministic Adaptation production acceptance passed, including legitimate review/maintain no-action behavior
+- [x] Sandbox Yield Intelligence production acceptance passed
+- [x] Sentinel demo/non-live event-monitoring production acceptance passed
+- [x] Sentinel influenced deterministic risk context only through corroboration/expiry rules
+- [x] Risk-context change invalidated stale MARA advisory
+- [x] Risk-context change invalidated stale dependent Adaptation Plan
+- [x] No automatic MARA or Adaptation regeneration occurred
+- [x] No wallet signature or transaction occurred during acceptance
 
 ## NEEDS SCREENSHOT
 

@@ -1,0 +1,71 @@
+{
+  "status": "deployed-governance-complete",
+  "chainId": 196,
+  "releaseMode": "approval-required",
+  "rpcEnv": "XLAYER_MAINNET_RPC_URL",
+  "deploymentBlocks": { "first": 68135432, "final": 68135498 },
+  "deployer": "0x7bc8489c39A750CCFa6C06d5d6dB5F682976234E",
+  "initialAdmin": "0x7bc8489c39A750CCFa6C06d5d6dB5F682976234E",
+  "productionAdmin": "0xF4AC7C9ad5A809240291a4F2E4CbE9189b14cdf4",
+  "executor": null,
+  "assetRegistry": "0xd211E4d1e1049d800d5360A078d52B0fcDD74684",
+  "valuationProvider": "0x4BC1974cdf868702bcC2B6B7D9F8aF54A7A156Dc",
+  "protocolAdapterRegistry": "0x836B4866d5BA31F4B2f6d05e65C26b8960A1604A",
+  "uniswapAdapter": "0x009e2dfEa3FE134BcE3F769aA3E6C287823af184",
+  "aaveAdapter": "0xd7c2662e436Bd1D50A6AA033C05DB905A2dddc83",
+  "managedVaultFactory": "0xE0969F6F0C0cFEE3F34132466f84CF45e883DcA5",
+  "managedVaultFactoryV1": "0xE0969F6F0C0cFEE3F34132466f84CF45e883DcA5",
+  "managedVaultFactoryV2": { "implemented": true, "forkProven": true, "deployed": true, "postDeploymentVerified": true, "address": "0x98dE37855b85993C0cA6746b667BA01f2894efad", "helper": "0x9550049F7896599630D6eE7D6D3E5F72b9A1DA0C", "transactionHash": "0x6c407bc749b62565e4b8c1380605f036d35f6a178ebe9ee5fd63e083f6b5549c", "block": 68405395, "frontendEnvKey": "NEXT_PUBLIC_ADAPTARA_FACTORY_V2_ADDRESS", "frontendMode": "read-only", "publicWritesEnabled": false },
+  "deployments": [
+    { "contract": "AssetRegistry", "address": "0xd211E4d1e1049d800d5360A078d52B0fcDD74684", "transactionHash": "0x153cca51a61cf2bee5d7ef67075babbd90bb27090cc257dedf7679ea37c42c0e", "block": 68135432 },
+    { "contract": "ChainlinkValuationProviderV1", "address": "0x4BC1974cdf868702bcC2B6B7D9F8aF54A7A156Dc", "transactionHash": "0xfa38be2db5b78d7c055f02938c37a8e22bc0a6f866abe8a026b4921ea0af7e3c", "block": 68135436 },
+    { "contract": "ProtocolAdapterRegistryV1", "address": "0x836B4866d5BA31F4B2f6d05e65C26b8960A1604A", "transactionHash": "0x67c2da7c48a0ed20c85bc06b8ffd2eb0b3f41f31aa2919c64039eac50826a05a", "block": 68135440 },
+    { "contract": "UniswapV3SwapAdapterV1", "address": "0x009e2dfEa3FE134BcE3F769aA3E6C287823af184", "transactionHash": "0xa4fd894d5d5627e4a1349cb1891fa5138da3b9339b9425654f956fc0515a1a7b", "block": 68135443 },
+    { "contract": "AaveV3YieldAdapterV1", "address": "0xd7c2662e436Bd1D50A6AA033C05DB905A2dddc83", "transactionHash": "0x334db9815afdc9ae8c96edcd6de6f91fd54b5da7716b335550f06a4ee39630d8", "block": 68135447 },
+    { "contract": "AdaptiveManagedVaultFactoryV1", "address": "0xE0969F6F0C0cFEE3F34132466f84CF45e883DcA5", "transactionHash": "0xae92af7291ac9010b81c61190e40570277961bb3f6d2cd871a6fd338f417d579", "block": 68135451 },
+    { "contract": "AdaptiveManagedVaultFactoryV2", "address": "0x98dE37855b85993C0cA6746b667BA01f2894efad", "helper": "0x9550049F7896599630D6eE7D6D3E5F72b9A1DA0C", "transactionHash": "0x6c407bc749b62565e4b8c1380605f036d35f6a178ebe9ee5fd63e083f6b5549c", "block": 68405395, "postDeploymentVerified": true }
+  ],
+  "configurationTransactions": [
+    { "action": "register-usdt-reserve", "transactionHash": "0x3311aa309d8edacda26353dda4ca470ea0782186e3083fe687a7f8081fb539ac", "block": 68135455 },
+    { "action": "register-xeth-balanced", "transactionHash": "0x5cff3ff0c1c700f42487ae51c57e6734a70f72bdfa060456851e1fbd855d80d6", "block": 68135458 },
+    { "action": "configure-usdt-usd", "transactionHash": "0x24c4828f86959615c12dede57d847a1eecb9e410a776de59a2d4c83564540d3b", "block": 68135462 },
+    { "action": "configure-xeth-eth-usd", "transactionHash": "0x85e1576d6e9d129c0f004c2847fc4aee3a947b8244e2c27136567fe018ce7603", "block": 68135466 },
+    { "action": "register-uniswap-adapter", "transactionHash": "0xf8aeb72560b0ffdc303d16d29710b5a092831d88d467911672504eb338c48e98", "block": 68135472 },
+    { "action": "register-aave-adapter", "transactionHash": "0x6a33945073ed90584810bc6069b54584baa419d6ef8aad4a1bec6c81051e690c", "block": 68135476 },
+    { "action": "configure-xeth-usdt-500", "transactionHash": "0x859da4e3f98abfd0088a046cc69ee7f17ea69c58ef0267d4021f8ebb6cf4d8da", "block": 68135480 },
+    { "action": "revoke-pair-configurator", "transactionHash": "0x45f14d0a93821ed436d3eda1e43e79e4a384046ea1f78249f1b24b2b7b6b4585", "block": 68135484 },
+    { "action": "begin-asset-admin-transfer", "transactionHash": "0x2d8a58d87279f055a07ff4fe8d6857d64db870ce8d22aaa3b8d0ce408654536c", "block": 68135487 },
+    { "action": "begin-valuation-admin-transfer", "transactionHash": "0x8c0e2311a15b768d9bd2ae870ad830cdfd3b3e65e5384722719b4b549bbc3af6", "block": 68135491 },
+    { "action": "begin-protocol-admin-transfer", "transactionHash": "0xa9ce2054b25bdd6a868f51370b39c9da5f56032f3160a3fa106450e90cd3329f", "block": 68135494 },
+    { "action": "begin-uniswap-admin-transfer", "transactionHash": "0x9d1ed0db294ff11228d50dd8f1056b742d78896bac2d125c9389e927ea9a30ad", "block": 68135498 }
+  ],
+  "external": {
+    "uniswapFactory": "0x4B2ab38DBF28D31D467aA8993f6c2585981D6804",
+    "uniswapRouter02": "0x4f0C28f5926AFDA16bf2506D5D9e57Ea190f9bcA",
+    "uniswapQuoterV2": "0xD1b797D92d87B688193A2B976eFc8D577D204343",
+    "xEthUsdtPool500": "0x77ef18adF35f62B2Ad442e4370cDbC7fe78B7dcC",
+    "aavePool": "0xE3F3Caefdd7180F884c01E57f65Df979Af84f116",
+    "aaveDataProvider": "0x6C505C31714f14e8af2A03633EB2Cdfb4959138F",
+    "aUsdt": "0xF356ae412dB5df43BD3a10746f7ad4e1C4De4297",
+    "sequencerUptimeFeed": "0x45c2b8C204568A03Dc7A2E32B71D67Fe97F908A9"
+  },
+  "assets": [
+    { "symbol": "USDT", "address": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736", "classification": "Reserve", "feed": "0xb928a0678352005a2e51F614efD0b54C9830dB80", "maximumAgeSeconds": 90000, "liveManagement": true },
+    { "symbol": "xETH", "address": "0xE7B000003A45145decf8a28FC755aD5eC5EA025A", "classification": "Balanced", "feed": "0x8b85b50535551F8E8cDAF78dA235b5Cf1005907b", "maximumAgeSeconds": 90000, "liveManagement": true }
+  ],
+  "route": { "tokenIn": "0xE7B000003A45145decf8a28FC755aD5eC5EA025A", "tokenOut": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736", "fee": 500, "reverseConfigured": false },
+  "aave": { "underlying": "0x779Ded0c9e1022225f8E0630b35a9b54bE713736", "aToken": "0xF356ae412dB5df43BD3a10746f7ad4e1C4De4297", "newSupplyGuarded": true, "withdrawEnabled": true },
+  "governance": {
+    "state": "complete",
+    "productionAdmin": "0xF4AC7C9ad5A809240291a4F2E4CbE9189b14cdf4",
+    "pendingTransfers": [],
+    "acceptances": [
+      { "contract": "AssetRegistry", "transactionHash": "0x39fc75ced5d50e2faa44e87f8f7a1d7bbc090d656d63aea77a3474a6a33198d2", "block": 68398235 },
+      { "contract": "ChainlinkValuationProviderV1", "transactionHash": "0xd0936f8a70919baa09f12f8ab3bfcbb1c7ffbf2ac65f0a76a498c63b4623ec77", "block": 68398385 },
+      { "contract": "ProtocolAdapterRegistryV1", "transactionHash": "0x3fed4819738da3adcab27293c4058dabbd7558295fcaf7a6e1dded8d9b3cdff5", "block": 68398453 },
+      { "contract": "UniswapV3SwapAdapterV1", "transactionHash": "0x4f154ca8778709610ea76da4d10f329678bdeb08d91b54ad8474ad55b7f489e3", "block": 68398532 }
+    ]
+  },
+  "capabilities": { "uniswapXethToUsdt": true, "uniswapUsdtToXeth": false, "aaveNewSupplyEnabled": true, "aaveWithdrawEnabled": true, "adaptiveExecutorEnabled": false },
+  "actualCost": { "deploymentGas": 11654801, "configurationGas": 752152, "totalGas": 12406953, "effectiveGasPriceWei": "20000001", "totalWei": "248139072406953", "totalOkb": "0.000248139072406953" }
+}

@@ -1,7 +1,9 @@
 import type { Address } from "viem";
+import type { DiscoveredManagedVault } from "@/features/vaults/discovery";
 
 export const ASSET_IDS = ["usdt0", "strsy", "sxau", "saaplx"] as const;
-export type AssetId = (typeof ASSET_IDS)[number];
+export type CanonicalAssetId = (typeof ASSET_IDS)[number];
+export type AssetId = CanonicalAssetId | "usdt" | "xeth";
 export type PortfolioSource = "wallet" | "vault";
 export type AssetAvailability = "available" | "not-configured" | "unsupported" | "unpriced" | "read-error" | "configuration-error";
 export type ValuationStatus = "valued" | "partial" | "unavailable";
@@ -52,4 +54,4 @@ export type VaultDiscovery =
   | { status: "wrong-chain" }
   | { status: "read-error"; error: string }
   | { status: "not-created" }
-  | { status: "available"; address: Address };
+  | { status: "available"; address: Address; vaults: readonly DiscoveredManagedVault[]; selected: DiscoveredManagedVault; issues?: readonly { source: "v1" | "v2"; message: string }[] };

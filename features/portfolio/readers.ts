@@ -1,6 +1,7 @@
-import { getAddress, zeroAddress, type Address, type PublicClient } from "viem";
+import { type Address, type PublicClient } from "viem";
 import { XLAYER_TESTNET_CHAIN_ID } from "@/lib/chain/xlayer";
-import { erc20ReadAbi, vaultFactoryReadAbi } from "./abis";
+import { erc20ReadAbi } from "./abis";
+import { discoverManagedVaults } from "@/features/vaults/discovery";
 import { formatUnitsExact, PRICE_DECIMALS } from "./money";
 import type { ReferencePriceProvider } from "./prices";
 import type { AssetMetadata, AssetPosition, PortfolioSnapshot, PortfolioSource, VaultDiscovery } from "./types";
@@ -11,10 +12,10 @@ const failedPosition = (asset: AssetMetadata, availability: AssetPosition["avail
   usdValue: null, usdValueDecimals: PRICE_DECIMALS, allocationBps: null, error,
 });
 
-export async function readPortfolio(params: { client: PublicClient; accountAddress: Address; assets: readonly AssetMetadata[]; source: PortfolioSource; priceProvider: ReferencePriceProvider }): Promise<PortfolioSnapshot> {
-  const { client, accountAddress, assets, source, priceProvider } = params;
+export async function readPortfolio(params: { client: PublicClient; accountAddress: Address; assets: readonly AssetMetadata[]; source: PortfolioSource; priceProvider: ReferencePriceProvider; expectedChainId?: number }): Promise<PortfolioSnapshot> {
+  const { client, accountAddress, assets, source, priceProvider, expectedChainId = XLAYER_TESTNET_CHAIN_ID } = params;
   const chainId = await client.getChainId();
-  if (chainId !== XLAYER_TESTNET_CHAIN_ID) throw new Error(`Unsupported chain ${chainId}; expected ${XLAYER_TESTNET_CHAIN_ID}`);
+  if (chainId !== expectedChainId) throw new Error(`Unsupported chain ${chainId}; expected ${expectedChainId}`);
   const blockNumber = await client.getBlockNumber();
   const configured = assets.filter((asset) => asset.address);
   const readResults = await Promise.all(configured.map(async (asset) => {
@@ -47,11 +48,14 @@ const errorMessage = (error: unknown, fallback: string): string => error instanc
 export const readWalletPortfolio = (params: Omit<Parameters<typeof readPortfolio>[0], "source">) => readPortfolio({ ...params, source: "wallet" });
 export const readVaultPortfolio = (params: Omit<Parameters<typeof readPortfolio>[0], "source">) => readPortfolio({ ...params, source: "vault" });
 
-export async function discoverVault(client: PublicClient, owner: Address, factoryAddress?: Address): Promise<VaultDiscovery> {
-  if (!factoryAddress) return { status: "not-configured" };
+export async function discoverVault(client: PublicClient, owner: Address, v1Factory?: Address, v2Factory?: Address, expectedChainId: number = XLAYER_TESTNET_CHAIN_ID): Promise<VaultDiscovery> {
+  if (!v1Factory && !v2Factory) return { status: "not-configured" };
   try {
-    if (await client.getChainId() !== XLAYER_TESTNET_CHAIN_ID) return { status: "wrong-chain" };
-    const vault = await client.readContract({ address: factoryAddress, abi: vaultFactoryReadAbi, functionName: "vaultOf", args: [owner] });
-    return vault === zeroAddress ? { status: "not-created" } : { status: "available", address: getAddress(vault) };
+    if (await client.getChainId() !== expectedChainId) return { status: "wrong-chain" };
+    const { vaults, issues } = await discoverManagedVaults({ client, owner, v1Factory, v2Factory });
+    if (vaults.length === 0) return issues.length
+      ? { status: "read-error", error: issues.map((issue) => `${issue.source.toUpperCase()}: ${issue.message}`).join("; ") }
+      : { status: "not-created" };
+    return { status: "available", address: vaults[0].address, selected: vaults[0], vaults, ...(issues.length ? { issues } : {}) };
   } catch (error) { return { status: "read-error", error: error instanceof Error ? error.message : "Vault discovery failed" }; }
 }

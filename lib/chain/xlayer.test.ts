@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { isAddress } from "viem";
-import { TEST_USDT0_ADDRESS, XLAYER_TESTNET_CHAIN_ID, xLayerTestnet } from "./xlayer";
+import { TEST_USDT0_ADDRESS, XLAYER_MAINNET_CHAIN_ID, XLAYER_MAINNET_RPC_URLS, XLAYER_TESTNET_CHAIN_ID, xLayerMainnet, xLayerTestnet } from "./xlayer";
 
 describe("X Layer Testnet configuration", () => {
   it("uses the locked testnet values", () => {
@@ -8,6 +8,13 @@ describe("X Layer Testnet configuration", () => {
     expect(xLayerTestnet.id).toBe(1952);
     expect(xLayerTestnet.nativeCurrency.symbol).toBe("OKB");
     expect(xLayerTestnet.testnet).toBe(true);
+  });
+
+  it("defines canonical X Layer Mainnet independently of the active environment", () => {
+    expect(xLayerMainnet.id).toBe(XLAYER_MAINNET_CHAIN_ID);
+    expect(xLayerMainnet.id).toBe(196);
+    expect(xLayerMainnet.nativeCurrency.symbol).toBe("OKB");
+    expect(xLayerMainnet.rpcUrls.default.http).toContain(XLAYER_MAINNET_RPC_URLS[0]);
   });
 
   it("contains a valid test USD0 address", () => {
