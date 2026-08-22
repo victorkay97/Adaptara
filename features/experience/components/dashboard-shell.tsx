@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useAccount } from "wagmi";
 import { WalletControl } from "@/components/wallet/wallet-control";
 import { PortfolioDashboard } from "@/features/portfolio/components/portfolio-dashboard";
-import { activeXLayer, isLiveReadOnlyMode } from "@/lib/chain/xlayer";
+import { activeXLayer } from "@/lib/chain/xlayer";
 import { ApplicationHeader } from "./application-header";
 import { LiveUnavailableDashboard } from "./live-unavailable-dashboard";
 
@@ -19,12 +19,13 @@ export function DashboardShell({ showOrientation = false }: { showOrientation?: 
   const { isConnected, chain } = useAccount();
   const [destination, setDestination] = useState<DashboardDestination>("Home");
   const [orientationDismissed, setOrientationDismissed] = useState(false);
-  const readReady = isConnected && (isLiveReadOnlyMode || chain?.id === activeXLayer.id);
+  const readReady = isConnected && chain?.id === activeXLayer.id;
+  const networkLabel = isConnected ? chain?.name ?? "Wrong network" : activeXLayer.name;
   const dismissOrientation = () => { window.history.replaceState({}, "", "/dashboard"); setOrientationDismissed(true); };
 
   return <main className="final-app dashboard-page">
-    <ApplicationHeader navigation={DASHBOARD_DESTINATIONS.map((item) => <button key={item} type="button" aria-current={destination === item ? "page" : undefined} onClick={() => setDestination(item)}>{item}</button>)} context={<><span className="final-live-badge"><i/>Live</span><span className={readReady ? "network-badge network-badge--ready" : "network-badge"}>X Layer Mainnet</span><WalletControl /></>} />
-    <div className="final-app-canvas">{!isConnected ? <LiveUnavailableDashboard destination={destination} connectionAction={<WalletControl variant="primary"/>} /> : !readReady ? <LiveUnavailableDashboard destination={destination} reason="Switch to X Layer before Adaptara reads live portfolio or Vault state." /> : <div className="dashboard-view"><PortfolioDashboard destination={destination} onNavigate={setDestination} /></div>}</div>
+    <ApplicationHeader navigation={DASHBOARD_DESTINATIONS.map((item) => <button key={item} type="button" aria-current={destination === item ? "page" : undefined} onClick={() => setDestination(item)}>{item}</button>)} context={<><span className="final-live-badge"><i/>Live</span><span className={readReady ? "network-badge network-badge--ready" : "network-badge"}>{networkLabel}</span><WalletControl /></>} />
+    <div className="final-app-canvas">{!isConnected ? <LiveUnavailableDashboard destination={destination} connectionAction={<WalletControl variant="primary"/>} /> : !readReady ? <LiveUnavailableDashboard destination={destination} connected reason={`Wrong network. Adaptara Live Mode uses ${activeXLayer.name}.`} /> : <div className="dashboard-view"><PortfolioDashboard destination={destination} onNavigate={setDestination} /></div>}</div>
     {showOrientation && isConnected && !orientationDismissed ? <OrientationContent onDismiss={dismissOrientation} /> : null}
   </main>;
 }

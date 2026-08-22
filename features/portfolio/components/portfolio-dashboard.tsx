@@ -32,6 +32,9 @@ import { MaraActivityLoop } from "@/features/mara/components/mara-activity-loop"
 import { canReadVaultPortfolio, deriveDefaultPortfolioSource, deriveWorkspaceReadiness, ReadinessSummary, SourceSwitcher, WorkspaceAuthorityGate, WorkspacePanel, WorkspaceSourceContent, type PortfolioSource, type WorkspaceReadiness } from "@/features/dashboard/components/workspace-controls";
 import { TechnicalDisclosure } from "@/components/ui/product-primitives";
 import type { DashboardDestination } from "@/features/experience/components/dashboard-shell";
+import { DASHBOARD_DESTINATIONS } from "@/features/experience/components/dashboard-shell";
+import { LiveConnectedDashboard } from "@/features/experience/components/live-connected-dashboard";
+import { LiveUnavailableDashboard } from "@/features/experience/components/live-unavailable-dashboard";
 import { AskMara } from "@/features/mara/assistant/ask-mara";
 import { buildAskMaraContext } from "@/features/mara/assistant/context";
 import { MingcuteIcon } from "@/components/ui/mingcute-icon";
@@ -145,6 +148,9 @@ function SnapshotPanel({ title, snapshot, constitution, contextTools, destinatio
   const compliance = constitution ? evaluateConstitutionCompliance(snapshot, constitution.constitution) : undefined;
   const assistantContext = buildAskMaraContext({ destination, snapshot, assessment: riskAssessment, compliance, policy: constitution?.constitution, displayValue: snapshot.totals.totalUsdValue > 0n ? displayUsd(snapshot.totals.totalUsdValue, snapshot.totals.usdValueDecimals) : null });
   const allocations = snapshot.positions.filter((position) => position.allocationBps !== null && position.allocationBps > 0);
+  if ((DASHBOARD_DESTINATIONS as readonly string[]).includes(destination)) {
+    return <LiveConnectedDashboard destination={destination} snapshot={snapshot} riskTier={riskAssessment.portfolioCurrentRiskTier} vaults={vaults ?? []} selected={selectedVault} constitution={constitution} onNavigate={onNavigate} />;
+  }
   const pageHeading = destination === "Home" ? ["Overview", "Your Adaptara position.", "Your wallet, managed Vault and current deterministic risk at a glance."] : destination === "Portfolio" ? ["Portfolio", "Your complete X Layer position.", "Review supported holdings, allocation, and deterministic risk for the selected source."] : destination === "Vaults" ? ["Vaults", "Independently governed capital.", "Review your deployed V1 Managed Vault and its own Financial Constitution."] : destination === "Activity" ? ["Activity", "What happened.", "A truthful record is shown only when authoritative events are available."] : destination === "MARA" ? ["MARA", "Ask MARA about your portfolio.", "Understand what may deserve attention, then explicitly explore a bounded simulation."] : ["Safety", "What protects you.", "Review owner-controlled rules, current compliance, and who has authority."];
   return <section aria-labelledby="dashboard-destination-title" data-selected-vault={selectedVault?.address} data-selected-vault-source={selectedVault?.source} className="portfolio-workspace rounded-3xl border border-white/80 bg-[var(--surface)] p-5 shadow-[0_20px_60px_rgba(34,57,43,0.08)] sm:p-7">
     <header className="destination-heading"><p>{pageHeading[0]}</p><h1 id="dashboard-destination-title">{pageHeading[1]}</h1><span>{pageHeading[2]}</span></header>
@@ -183,7 +189,7 @@ export function PortfolioDashboard({ destination = "Home", onNavigate = () => un
   const { address, chain, isConnected } = useAccount();
   const connected = Boolean(isConnected && address);
   const client = usePublicClient({ chainId: activeXLayer.id });
-  const readReady = isLiveReadOnlyMode || chain?.id === activeXLayer.id;
+  const readReady = chain?.id === activeXLayer.id;
   const assets = isLiveReadOnlyMode ? MAINNET_ASSET_CATALOG : ASSET_CATALOG;
   const priceProvider = isLiveReadOnlyMode ? unavailableLivePrices : demoPrices;
   const wallet = useQuery({ queryKey: ["portfolio", "wallet", activeXLayer.id, address], enabled: Boolean(address && readReady && client), queryFn: () => readWalletPortfolio({ client: client!, accountAddress: address!, assets, priceProvider, expectedChainId: activeXLayer.id }) });
@@ -204,6 +210,22 @@ export function PortfolioDashboard({ destination = "Home", onNavigate = () => un
   const vaultContent = vault.isPending ? <LoadingCard label="Discovering Adaptara Vault" /> : vault.data?.status === "not-configured" ? <VaultUnavailablePanel message="Vault integration is not configured in this environment. An Adaptara Vault is an isolated smart-contract vault governed by your Financial Constitution." /> : vault.data?.status === "not-created" ? <VaultUnavailablePanel message="No Adaptara Vault has been created for this wallet. Vault creation is not enabled in this product." /> : vault.data?.status === "read-error" ? <VaultUnavailablePanel message={`Vault discovery unavailable: ${vault.data.error}`} role="alert" /> : vaultPortfolio.isPending ? <LoadingCard label="Reading vault portfolio" /> : vaultPortfolio.isError ? <VaultUnavailablePanel message={`Vault portfolio unavailable: ${vaultPortfolio.error.message}`} role="alert" /> : vaultPortfolio.data && selectedVault ? <SnapshotPanel title="Adaptara Vault" snapshot={vaultPortfolio.data} constitution={activeConstitution ?? undefined} contextTools={contextTools} destination={destination} onNavigate={onNavigate} vaults={discoveredVaults} selectedVault={selectedVault} onSelectVault={(item) => { setSelectedVaultAddress(item.address); setActiveConstitution(null); }} /> : null;
   const selectVault = (item: DiscoveredManagedVault) => { setSelectedVaultAddress(item.address); setActiveConstitution(null); setSelectedSource("vault"); };
   const walletContent = wallet.isPending ? <LoadingCard label="Reading wallet portfolio" /> : wallet.isError ? <ErrorCard message={`Wallet portfolio unavailable: ${wallet.error.message}`} /> : wallet.data ? <SnapshotPanel title="Your Wallet" snapshot={wallet.data} contextTools={contextTools} destination={destination} onNavigate={onNavigate} vaults={discoveredVaults} selectedVault={selectedVault} onSelectVault={selectVault} /> : null;
+
+  const primaryDestination = (DASHBOARD_DESTINATIONS as readonly string[]).includes(destination);
+  if (primaryDestination && source === "wallet" && (wallet.isPending || wallet.isError || !wallet.data)) {
+    const reason = wallet.isPending ? "Reading authoritative wallet portfolio state." : wallet.isError ? "Wallet portfolio is currently unavailable." : "No authoritative wallet portfolio state is available.";
+    return <LiveUnavailableDashboard destination={destination} connected reason={reason} />;
+  }
+  if (primaryDestination && source === "vault" && (vault.isPending || vaultPortfolio.isPending || vault.isError || vaultPortfolio.isError || !vaultPortfolio.data)) {
+    const reason = vault.isPending ? "Discovering authoritative V1 and V2 Vaults." : vaultPortfolio.isPending ? "Reading the selected Vault portfolio." : "Selected Vault state is currently unavailable.";
+    return <LiveUnavailableDashboard destination={destination} connected reason={reason} />;
+  }
+  if (primaryDestination && source === "wallet" && wallet.data) {
+    return <SnapshotPanel title="Your Wallet" snapshot={wallet.data} contextTools={contextTools} destination={destination} onNavigate={onNavigate} vaults={discoveredVaults} selectedVault={selectedVault} onSelectVault={selectVault} />;
+  }
+  if (primaryDestination && source === "vault" && vaultPortfolio.data && selectedVault) {
+    return <SnapshotPanel title="Adaptara Vault" snapshot={vaultPortfolio.data} constitution={activeConstitution ?? undefined} contextTools={contextTools} destination={destination} onNavigate={onNavigate} vaults={discoveredVaults} selectedVault={selectedVault} onSelectVault={(item) => { setSelectedVaultAddress(item.address); setActiveConstitution(null); }} />;
+  }
 
   return <div className="workspace-shell">
     <WorkspacePanel source={source}><WorkspaceAuthorityGate isConnected={connected} onXLayer={Boolean(readReady)} disconnected={<><EmptyState title="Connect your wallet" detail="Connect an existing wallet to inspect supported holdings and begin the explicit intelligence journey." />{contextTools}</>} wrongNetwork={<><EmptyState title="Wrong network" detail="Switch to X Layer to read supported wallet or vault balances." warning />{contextTools}</>} authorized={<WorkspaceSourceContent source={source} wallet={<div>{walletContent}</div>} vault={<><div>{vaultContent}</div>{destination === "Safety" && client && vault.data && selectedVault ? <section className="workspace-domain workspace-domain--policy" aria-label="Financial Constitution controls"><TechnicalDisclosure summary="View and manage owner-controlled Constitution"><FinancialConstitutionPanel key={`${address}:${selectedVault.address}`} address={address!} client={client} vault={vault.data.status === "available" ? { status: "available", address: selectedVault.address, vaults: vault.data.vaults, selected: selectedVault } : vault.data} snapshot={vault.data.status === "available" ? vaultPortfolio.data : undefined} onActiveChange={handleActiveConstitution} writesEnabled={LIVE_CONSTITUTION_WRITES_ENABLED} /></TechnicalDisclosure></section> : null}</>} />}/></WorkspacePanel>

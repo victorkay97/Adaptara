@@ -1,7 +1,7 @@
 import { renderToStaticMarkup } from "react-dom/server";
 import { QueryClient } from "@tanstack/react-query";
 import { describe, expect, it, vi } from "vitest";
-import { APPKIT_NAMESPACE, ConnectedWalletControl, WalletSelector, appKitWalletForChoice, clearAddressScopedQueries, friendlyWalletError } from "./wallet-control";
+import { APPKIT_NAMESPACE, ConnectedWalletControl, WalletSelector, appKitWalletForChoice, clearAddressScopedQueries, connectedWalletNetworkSummary, friendlyWalletError } from "./wallet-control";
 import { createAppKitMetadata } from "@/lib/wallet/metadata";
 
 const address = "0x7bc800000000000000000000000000000000234E" as const;
@@ -11,6 +11,10 @@ describe("connected wallet network presentation", () => {
   it("shows a compact connected address trigger without undefined copy", () => { const html = renderConnected(true); expect(html).toContain("0x7bc8"); expect(html).toContain('aria-haspopup="menu"'); expect(html).not.toMatch(/undefined|null/); });
   it("keeps the wrong-network recovery outside the account menu", () => { const html = renderConnected(false); expect(html).toContain("Switch to X Layer"); expect(html).not.toMatch(/undefined|null|Chain undefined|0\.0000 OKB/); });
   it("keeps the explicit Switch to X Layer action without operational additions", () => { const html = renderConnected(false); expect(html).toContain("Switch to X Layer"); expect(html).not.toMatch(/Run Sentinel|Analyze with MARA|Generate Adaptation|Run Compounding|sendTransaction|writeContract/); });
+  it("uses one authoritative chain label in the account summary", () => {
+    expect(connectedWalletNetworkSummary({ networkLabel: "X Layer Mainnet", onXLayer: true, readOnly: true, balanceLabel: "0.0100 OKB" })).toBe("X Layer Mainnet · read only · 0.0100 OKB");
+    expect(connectedWalletNetworkSummary({ networkLabel: "X Layer Testnet", onXLayer: false, readOnly: true, balanceLabel: "99 OKB" })).toBe("X Layer Testnet");
+  });
 });
 
 describe("local network-control isolation", () => {

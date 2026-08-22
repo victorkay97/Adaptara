@@ -51,7 +51,7 @@ export function WalletControl({ variant = "default", onConnectRequested, onConne
     void connection.then(() => setSelectorOpen(false)).catch((error: unknown) => setLocalError(friendlyWalletError(error instanceof Error ? error : null)));
   }} /> : appKitError ? <p className="wallet-error" role="alert">{friendlyWalletError(appKitError)}</p> : null}</div>;
 
-  return <ConnectedWalletControl address={address} onXLayer={onXLayer} readOnly={isLiveReadOnlyMode} showNetworkSwitch={showNetworkSwitch} balanceLabel={onXLayer && balance ? `${Number(formatEther(balance.value)).toFixed(4)} OKB` : undefined} isSwitching={isSwitching} onSwitch={() => switchChain({ chainId: activeXLayer.id })} onDisconnect={() => { clearAddressScopedQueries(queryClient, address); disconnect(); }} />;
+  return <ConnectedWalletControl address={address} onXLayer={onXLayer} networkLabel={chain?.name ?? "Wrong network"} explorerBaseUrl={chain?.blockExplorers?.default.url} readOnly={isLiveReadOnlyMode} showNetworkSwitch={showNetworkSwitch} balanceLabel={onXLayer && balance ? `${Number(formatEther(balance.value)).toFixed(4)} OKB` : undefined} isSwitching={isSwitching} onSwitch={() => switchChain({ chainId: activeXLayer.id })} onDisconnect={() => { clearAddressScopedQueries(queryClient, address); disconnect(); }} />;
 }
 
 export function WalletSelector({ environment, pending, error, onClose, onSelect }: { environment: ReturnType<typeof browserWalletEnvironment>; pending: boolean; error?: string; onClose: () => void; onSelect: (wallet: WalletChoice) => void }) {
@@ -101,7 +101,11 @@ export function clearAddressScopedQueries(queryClient: QueryClient, address: Add
   queryClient.removeQueries({ predicate: (query) => query.queryKey.some((part) => typeof part === "string" && part.toLowerCase() === needle) });
 }
 
-export function ConnectedWalletControl({ address, onXLayer, readOnly = false, showNetworkSwitch = true, balanceLabel, isSwitching, onSwitch, onDisconnect }: { address: Address; onXLayer: boolean; readOnly?: boolean; showNetworkSwitch?: boolean; balanceLabel?: string; isSwitching: boolean; onSwitch: () => void; onDisconnect: () => void }) {
+export function connectedWalletNetworkSummary({ networkLabel, onXLayer, readOnly, balanceLabel }: { networkLabel: string; onXLayer: boolean; readOnly: boolean; balanceLabel?: string }) {
+  return `${networkLabel}${readOnly && onXLayer ? " · read only" : ""}${onXLayer && balanceLabel ? ` · ${balanceLabel}` : ""}`;
+}
+
+export function ConnectedWalletControl({ address, onXLayer, networkLabel = activeXLayer.name, explorerBaseUrl, readOnly = false, showNetworkSwitch = true, balanceLabel, isSwitching, onSwitch, onDisconnect }: { address: Address; onXLayer: boolean; networkLabel?: string; explorerBaseUrl?: string; readOnly?: boolean; showNetworkSwitch?: boolean; balanceLabel?: string; isSwitching: boolean; onSwitch: () => void; onDisconnect: () => void }) {
   const [open, setOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
   useEffect(() => {
@@ -111,9 +115,10 @@ export function ConnectedWalletControl({ address, onXLayer, readOnly = false, sh
     document.addEventListener("mousedown", close); document.addEventListener("keydown", escape);
     return () => { document.removeEventListener("mousedown", close); document.removeEventListener("keydown", escape); };
   }, [open]);
-  const explorerUrl = `${activeXLayer.blockExplorers?.default.url ?? "https://www.oklink.com/x-layer"}/address/${address}`;
+  const explorerUrl = `${explorerBaseUrl ?? activeXLayer.blockExplorers?.default.url ?? "https://www.oklink.com/x-layer"}/address/${address}`;
+  const networkSummary = connectedWalletNetworkSummary({ networkLabel, onXLayer, readOnly, balanceLabel });
   return <div className="wallet-account-group">
-    {showNetworkSwitch && !readOnly && !onXLayer ? <button type="button" disabled={isSwitching} onClick={onSwitch} className="wallet-button wallet-button--warning">{isSwitching ? "Switching…" : "Switch to X Layer"}</button> : null}
-    <div className="account-menu" ref={menuRef}><button type="button" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)} className="wallet-account"><i aria-hidden="true" /><span>{shortenAddress(address)}</span></button>{open ? <div className="account-dropdown" role="menu"><header><i aria-hidden="true" /><div><span>Connected</span><strong>{shortenAddress(address, 6)}</strong><small>{readOnly ? "X Layer Mainnet · read only" : onXLayer ? activeXLayer.name : "Wrong network"}{!readOnly && onXLayer && balanceLabel ? ` · ${balanceLabel}` : ""}</small></div></header><button role="menuitem" onClick={() => void navigator.clipboard.writeText(address)}>Copy address</button><a role="menuitem" href={explorerUrl} target="_blank" rel="noreferrer">View on X Layer Explorer</a><button role="menuitem" className="account-dropdown__disconnect" onClick={onDisconnect}>Disconnect</button></div> : null}</div>
+    {showNetworkSwitch && !onXLayer ? <button type="button" disabled={isSwitching} onClick={onSwitch} className="wallet-button wallet-button--warning">{isSwitching ? "Switching…" : `Switch to ${activeXLayer.name}`}</button> : null}
+    <div className="account-menu" ref={menuRef}><button type="button" aria-haspopup="menu" aria-expanded={open} onClick={() => setOpen((value) => !value)} className="wallet-account"><i aria-hidden="true" /><span>{shortenAddress(address)}</span></button>{open ? <div className="account-dropdown" role="menu"><header><i aria-hidden="true" /><div><span>Connected</span><strong>{shortenAddress(address, 6)}</strong><small>{networkSummary}</small></div></header><button role="menuitem" onClick={() => void navigator.clipboard.writeText(address)}>Copy address</button><a role="menuitem" href={explorerUrl} target="_blank" rel="noreferrer">View on X Layer Explorer</a><button role="menuitem" className="account-dropdown__disconnect" onClick={onDisconnect}>Disconnect</button></div> : null}</div>
   </div>;
 }
