@@ -20,12 +20,16 @@ describe("Phase 12E experience foundation", () => {
   });
 
   it("renders the compact Live shell without leaking Demo fixture balances", () => {
-    const html = renderToStaticMarkup(<LiveUnavailableDashboard destination="Home" />);
+    const html = renderToStaticMarkup(<LiveUnavailableDashboard destination="Home" connectionAction={<button>Connect Wallet</button>} />);
     expect(html).toContain("Overview");
-    expect(html).toContain("Connect wallet to view your portfolio");
+    expect(html).toContain("Connect your wallet to view your X Layer portfolio");
+    expect(html).toContain("Not evaluated");
+    expect(html).toContain("No Vaults discovered");
+    expect(html).toContain("No live activity yet");
+    expect(html).toContain("Connect Wallet");
     expect(html).toContain("Your Vaults");
     expect(html).toContain("Recent Activity");
-    expect(html).not.toMatch(/\$25,000|\$10,500|\$14,500/);
+    expect(html).not.toMatch(/\$25,000|\$10,500|\$14,500|Growth Vault|Reserve Vault|Opportunity Vault|MARA flagged/);
   });
 
   it("renders the approved single-narrative landing structure without wallet controls", () => {

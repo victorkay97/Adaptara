@@ -1,26 +1,15 @@
+import type { ReactNode } from "react";
 import type { DashboardDestination } from "./dashboard-shell";
 
-const unavailableMetrics = [
-  ["Total Portfolio", "—", "Connect wallet to view your portfolio"],
-  ["In Vaults", "—", "Connect wallet to discover Vaults"],
-  ["Outside Vaults", "—", "Unavailable until connected"],
-  ["Active Vaults", "—", "Connect wallet to view"],
-] as const;
+const unavailableMetrics = [["Total Portfolio", "Available after wallet connection"], ["In Vaults", "Managed capital after discovery"], ["Outside Vaults", "Wallet-controlled capital"], ["Active Vaults", "Discovered after connection"]] as const;
 
-function Metrics() {
-  return <section className="final-metrics">{unavailableMetrics.map(([label, value, note]) => <article key={label}><small>{label}</small><strong>{value}</strong><span>{note}</span></article>)}</section>;
-}
+function Metrics() { return <section className="final-metrics">{unavailableMetrics.map(([label, note]) => <article key={label}><small>{label}</small><strong>—</strong><span>{note}</span></article>)}</section>; }
+function ConnectionPrompt({ action }: { action?: ReactNode }) { return <section className="live-connect-prompt"><div><h2>Connect your wallet to view your X Layer portfolio</h2><p>Read your holdings, discover your Vaults and let MARA analyze your current position.</p></div>{action}</section>; }
+function EmptyOverviewCards() { return <section className="final-triptych"><article className="final-section final-allocation live-allocation-empty"><header><span>Allocation</span></header><div className="live-empty-ring" aria-hidden="true"/><div className="live-skeleton-legend" aria-hidden="true">{[0,1,2,3].map(row => <i key={row}/>)}</div><p>Portfolio allocation appears after your wallet is connected.</p></article><article className="final-section final-state live-state-empty"><header><span>Portfolio state</span><em>Not evaluated</em></header><div className="live-neutral-stack" aria-hidden="true"><i/><i/><i/></div><p>Portfolio state will be calculated from supported live holdings.</p></article><article className="final-section final-health live-health-empty"><header><span>Vault health</span></header><div className="live-neutral-rows" aria-hidden="true">{[0,1,2].map(row => <i key={row}/>)}</div><p><strong>No Vaults discovered yet</strong>Connect your wallet to discover authoritative V1 and V2 Vaults.</p></article></section>; }
+function Home({ connectionAction }: { connectionAction?: ReactNode }) { return <><ConnectionPrompt action={connectionAction}/><Metrics/><EmptyOverviewCards/><section className="final-section final-mara live-mara-empty"><header><div><span>MARA Intelligence</span><p>MARA is ready to analyze your portfolio.</p></div><button type="button" disabled>Ask MARA</button></header><p>Connect a supported wallet to give MARA live portfolio context.</p></section><section className="final-section final-vault-preview live-vaults-empty"><h2>Your Vaults</h2><div><article><strong>No Vaults discovered</strong><span>Your independently governed Vaults will appear here after wallet connection.</span></article></div></section><section className="final-section final-table live-activity-empty"><h2>Recent Activity</h2><div className="final-table-head"><span>Event</span><span>Source</span><span>Time</span></div><div><span>No live activity yet</span><span>Verified Vault and portfolio events will appear here when available.</span><span>—</span></div></section></>; }
 
-function EmptySection({ title, copy }: { title: string; copy: string }) {
-  return <section className="final-section live-empty-section"><h2>{title}</h2><p>{copy}</p></section>;
-}
-
-function Home() {
-  return <><Metrics/><section className="final-triptych"><EmptySection title="Allocation" copy="Connect your wallet to calculate supported asset allocation."/><EmptySection title="Portfolio state" copy="Deterministic portfolio state is unavailable until live holdings can be read."/><EmptySection title="Vault health" copy="Connect your wallet to discover authoritative V1 and V2 Vault state."/></section><section className="final-section final-mara"><header><div><span>MARA Intelligence</span><p>Live intelligence remains unavailable until a supported portfolio is connected and read.</p></div></header></section><EmptySection title="Your Vaults" copy="Connect your wallet to discover independently governed Vaults."/><EmptySection title="Recent Activity" copy="Authoritative activity appears only from verified live state and events."/></>;
-}
-
-export function LiveUnavailableDashboard({ destination, reason = "Connect your wallet to read supported X Layer state." }: { destination: DashboardDestination; reason?: string }) {
+export function LiveUnavailableDashboard({ destination, reason = "Connect your wallet to read supported X Layer state.", connectionAction }: { destination: DashboardDestination; reason?: string; connectionAction?: ReactNode }) {
   const title = destination === "Home" ? "Overview" : destination;
   const copy = destination === "Home" ? "Live on X Layer. Your portfolio, Vaults and current Adaptara position." : `Live ${destination.toLowerCase()} state from X Layer.`;
-  return <><header className="final-page-head"><div><h1>{title}</h1><p>{copy}</p></div></header>{destination === "Home" ? <Home/> : <><Metrics/><EmptySection title={`${destination} unavailable`} copy={reason}/></>}</>;
+  return <><header className="final-page-head"><div><h1>{title}</h1><p>{copy}</p></div></header>{destination === "Home" ? <Home connectionAction={connectionAction}/> : <><Metrics/><section className="final-section live-empty-section"><h2>{destination} unavailable</h2><p>{reason}</p></section></>}</>;
 }
