@@ -56,6 +56,19 @@ describe("Phase 12E experience foundation", () => {
     expect(html).not.toContain("Product visual in design");
   });
 
+  it("keeps final landing states server-rendered while motion remains progressive and reduced-motion safe", () => {
+    const html = renderToStaticMarkup(<LandingPage />);
+    const motion = fs.readFileSync(path.join(process.cwd(), "features/experience/components/landing-motion.tsx"), "utf8");
+    const css = fs.readFileSync(path.join(process.cwd(), "app/globals.css"), "utf8");
+    expect(html).toContain("$25,000");
+    expect(html).toContain("$14,500 remains outside Adaptara");
+    expect(html).toContain("Projected xETH");
+    expect(html).toContain("BLOCKED");
+    expect(html).toContain("Nothing moved");
+    expect(motion).toContain('!("IntersectionObserver" in window)');
+    expect(css).toMatch(/@media\(prefers-reduced-motion:reduce\)[\s\S]*?\[data-motion\][\s\S]*?opacity:1!important/);
+  });
+
   it("uses semantic outline icons for trust cards and navigation affordances", () => {
     const html = renderToStaticMarkup(<LandingPage />);
     expect(html.match(/class="mingcute-icon"/g)?.length).toBeGreaterThanOrEqual(8);
